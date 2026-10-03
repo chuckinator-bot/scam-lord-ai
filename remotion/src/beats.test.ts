@@ -23,9 +23,10 @@ describe("film durations", () => {
         expect(INTRO.durationInFrames).toBe(330);
     });
 
-    it("keeps the demo inside 2250 to 2550 frames", () => {
-        expect(DEMO.durationInFrames).toBeGreaterThanOrEqual(2250);
-        expect(DEMO.durationInFrames).toBeLessThanOrEqual(2550);
+    it("keeps the demo between 60 and 65 seconds", () => {
+        expect(DEMO.durationInFrames).toBeGreaterThanOrEqual(60 * FPS);
+        expect(DEMO.durationInFrames).toBeLessThanOrEqual(65 * FPS);
+        expect(DEMO.durationInFrames).toBe(1831);
     });
 
     it("keeps the teaser near 750 frames", () => {
@@ -110,6 +111,16 @@ describe("captions", () => {
             "$800.00 today, $1,600.00 on the 14th. Lawn mowed Saturday.",
         );
         expect(beatById(TEASER, "lockup").caption).toBe("Built at the Supabase hackathon.");
+    });
+
+    it("keeps every caption on screen for at least two seconds", () => {
+        for (const filmSpec of FILMS) {
+            for (const beat of filmSpec.beats) {
+                if (beat.caption) {
+                    expect(beat.durationInFrames).toBeGreaterThanOrEqual(2 * FPS);
+                }
+            }
+        }
     });
 
     it("leaves the intro free of lower-third captions", () => {

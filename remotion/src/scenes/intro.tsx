@@ -9,6 +9,7 @@ import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoCon
 import { Logo, Tick } from "../components/chrome";
 import { BigAmount, Phone, Waveform } from "../components/devices";
 import { fontDisplay, fontSans } from "../fonts";
+import { CHASE_CARDS } from "../roster";
 import { overdueOnScreen, paidOnScreen, SPLIT_ENTER_START, SPLIT_EXIT_END, SPLIT_EXIT_START, SPLIT_SETTLE_FRAMES } from "../split-swap";
 import { theme } from "../theme";
 
@@ -149,13 +150,9 @@ export function ChaseBeat() {
                 } }
             >
                 <div style={ { display: "flex", flexDirection: "column", gap: 14 } }>
-                    { [
-                        ["John Smith", "$2,400.00"],
-                        ["Casey Diaz", "$960.00"],
-                        ["Avery Cole", "$1,800.00"],
-                    ].map(([name, amount], index) => (
+                    { CHASE_CARDS.map((tenant, index) => (
                         <div
-                            key={ name }
+                            key={ tenant.name }
                             style={ {
                                 background: theme.white,
                                 border: `2px solid ${theme.mint}`,
@@ -167,8 +164,8 @@ export function ChaseBeat() {
                                 width: 280,
                             } }
                         >
-                            <div style={ { fontSize: 18, fontWeight: 600 } }>{ name }</div>
-                            <div style={ { fontSize: 16, marginTop: 2 } }>{ amount }</div>
+                            <div style={ { fontSize: 18, fontWeight: 600 } }>{ tenant.name }</div>
+                            <div style={ { fontSize: 16, marginTop: 2 } }>{ tenant.amount }</div>
                         </div>
                     )) }
                 </div>
@@ -317,7 +314,7 @@ export function WakeBeat() {
                         maxWidth: 640,
                     } }
                 >
-                    Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties...
+                    Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties
                 </div>
             </div>
         </AbsoluteFill>

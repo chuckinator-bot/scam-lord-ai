@@ -7,7 +7,17 @@
 
 import { describe, expect, it } from "vitest";
 import { AGENT_EDGES, AGENT_STEPS } from "../../src/lib/agent-floor/agents";
-import { edgeDotCenter, layoutChain, MAIN_PATH, nodeLabel, STEP_LABEL } from "./floor-layout";
+import {
+    chainSideMargin,
+    edgeDotCenter,
+    handoffConnector,
+    HERO_GAP,
+    HERO_NODE_WIDTH,
+    layoutChain,
+    MAIN_PATH,
+    nodeLabel,
+    STEP_LABEL,
+} from "./floor-layout";
 
 describe("agent floor layout", () => {
     it("follows the main-path edges from the app", () => {
@@ -44,6 +54,24 @@ describe("agent floor layout", () => {
         const handoff = layout.find((node) => node.step === "handoff");
         expect(handoff?.y).toBe(110);
         expect(handoff?.y ?? 0).toBeLessThan(200 * 0.78);
+    });
+
+    it("leaves at least 64px on each side of the hero chain", () => {
+        expect(chainSideMargin(HERO_NODE_WIDTH, HERO_GAP)).toBeGreaterThanOrEqual(64);
+        expect(HERO_NODE_WIDTH / 168).toBeCloseTo(1.25, 2);
+    });
+
+    it("stops the handoff connector on the card edges", () => {
+        const layout = layoutChain(HERO_NODE_WIDTH, HERO_GAP, 140);
+        const jev = layout.find((node) => node.step === "jev");
+        const handoff = layout.find((node) => node.step === "handoff");
+        const nodeHeight = 110;
+        const edge = handoffConnector(jev!, handoff!, HERO_NODE_WIDTH, nodeHeight);
+        expect(edge.y1).toBeGreaterThanOrEqual((jev?.y ?? 0) + nodeHeight);
+        expect(edge.y2).toBeLessThanOrEqual(handoff?.y ?? 0);
+        expect(edge.y2).toBeGreaterThan(edge.y1);
+        expect(edge.x1).toBe((jev?.x ?? 0) + HERO_NODE_WIDTH / 2);
+        expect(edge.x2).toBe((handoff?.x ?? 0) + HERO_NODE_WIDTH / 2);
     });
 
     it("labels a node the way the floor does", () => {

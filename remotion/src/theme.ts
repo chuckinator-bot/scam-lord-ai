@@ -44,13 +44,14 @@ export type TStatus =
     | "Waiting on payment"
     | "Plan active"
     | "Paid"
-    | "Payment failed";
+    | "Payment failed"
+    | "Waiting on a person";
 
 export function statusColors(status: TStatus): { bg: string; ink: string } {
     if (status === "Overdue" || status === "Payment failed") {
         return { bg: theme.ink, ink: theme.mint };
     }
-    if (status === "Paid" || status === "Plan active") {
+    if (status === "Paid" || status === "Plan active" || status === "Waiting on payment" || status === "Waiting on a person") {
         return { bg: theme.mint, ink: theme.ink };
     }
     return { bg: theme.mintSoft, ink: theme.ink };

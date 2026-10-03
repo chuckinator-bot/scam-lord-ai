@@ -35,21 +35,34 @@ ffmpeg -y -hide_banner -loglevel error \
     -filter_complex "[1]adelay=70|70[b];[2]adelay=140|140[c];[3]adelay=210|210[d];[0][b][c][d]amix=inputs=4:duration=longest:normalize=0" \
     "$TMP/success.wav"
 
+VOICE_DUR="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$AUDIO/voice.wav")"
+FADE_START="$(awk -v duration="$VOICE_DUR" 'BEGIN { printf "%.3f", duration - 0.167 }')"
 ffmpeg -y -hide_banner -loglevel error \
-    -f lavfi -t 11 -i anullsrc=r=48000:cl=mono \
+    -i "$AUDIO/voice.wav" \
+    -af "afade=t=out:st=${FADE_START}:d=0.167" \
+    "$TMP/voice.wav"
+
+read -r INTRO_SEC DEMO_SEC TEASER_SEC < <(node --experimental-strip-types -e '
+import { DEMO, INTRO, TEASER, FPS } from "./src/beats.ts";
+const seconds = (frames) => (frames / FPS).toFixed(3);
+process.stdout.write(`${seconds(INTRO.durationInFrames)} ${seconds(DEMO.durationInFrames)} ${seconds(TEASER.durationInFrames)}\n`);
+')
+
+ffmpeg -y -hide_banner -loglevel error \
+    -f lavfi -t "$INTRO_SEC" -i anullsrc=r=48000:cl=mono \
     -i "$TMP/notify.wav" \
     -i "$TMP/ring.wav" \
-    -i "$AUDIO/voice.wav" \
+    -i "$TMP/voice.wav" \
     -i "$TMP/success.wav" \
     -filter_complex "\
 [1]adelay=520|520,volume=0.95[n];\
 [2]adelay=2050|2050,volume=0.78[r];\
-[3]adelay=4250|4250,volume=0.95[v];\
+[3]adelay=1050|1050,volume=0.95[v];\
 [4]adelay=7280|7280,volume=0.92[s];\
 [0][n][r][v][s]amix=inputs=5:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95" \
     "$AUDIO/intro.wav"
 
-ffmpeg -y -hide_banner -loglevel error -i "$AUDIO/intro.wav" -af "apad=pad_dur=67" -t 78 "$AUDIO/demo.wav"
-ffmpeg -y -hide_banner -loglevel error -i "$AUDIO/intro.wav" -af "apad=pad_dur=14" -t 25 "$AUDIO/teaser.wav"
+ffmpeg -y -hide_banner -loglevel error -i "$AUDIO/intro.wav" -af "apad=pad_dur=60" -t "$DEMO_SEC" "$AUDIO/demo.wav"
+ffmpeg -y -hide_banner -loglevel error -i "$AUDIO/intro.wav" -af "apad=pad_dur=20" -t "$TEASER_SEC" "$AUDIO/teaser.wav"
 
 echo "Wrote intro.wav, demo.wav, teaser.wav"

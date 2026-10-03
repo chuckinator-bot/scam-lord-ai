@@ -42,6 +42,49 @@ export interface INodeLayout {
     y: number;
 }
 
+/** Hero chain is 1.25x the original 168px card, with room for a 64px side margin. */
+export const HERO_NODE_WIDTH = 210;
+export const HERO_GAP = 16;
+export const FRAME_WIDTH = 1920;
+
+export function chainWidth(nodeWidth: number, gap: number): number {
+    return (MAIN_PATH.length - 1) * (nodeWidth + gap) + nodeWidth;
+}
+
+export function chainSideMargin(nodeWidth: number, gap: number, frameWidth = FRAME_WIDTH): number {
+    return (frameWidth - chainWidth(nodeWidth, gap)) / 2;
+}
+
+export interface IConnector {
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
+}
+
+/**
+ * Handoff edge from the bottom center of Jev to the top center of Handoff.
+ * Both ends sit on the card edges, so the stroke does not enter either card.
+ * @param jev - Jev card layout.
+ * @param handoff - Handoff card layout.
+ * @param nodeWidth - Card width in pixels.
+ * @param nodeHeight - Card height in pixels.
+ */
+export function handoffConnector(
+    jev: INodeLayout,
+    handoff: INodeLayout,
+    nodeWidth: number,
+    nodeHeight: number,
+): IConnector {
+    const inset = 2;
+    return {
+        x1: jev.x + nodeWidth / 2,
+        x2: handoff.x + nodeWidth / 2,
+        y1: jev.y + nodeHeight + inset,
+        y2: handoff.y - inset,
+    };
+}
+
 /**
  * @param nodeWidth - Card width in pixels.
  * @param gap - Horizontal gap between main-path cards.

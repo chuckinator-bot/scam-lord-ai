@@ -102,13 +102,15 @@ export function Phone({
 
 export function Gauge({
     score,
+    width = 820,
 }: {
     score: number;
+    width?: number;
 }) {
     const clamped = Math.max(0, Math.min(1, score));
     const hot = clamped >= 0.35;
     return (
-        <div style={ { width: 820 } }>
+        <div style={ { width } }>
             <div
                 style={ {
                     background: theme.surfaceSunken,

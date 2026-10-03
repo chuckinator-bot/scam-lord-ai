@@ -19,44 +19,12 @@ import {
 } from "../components/chrome";
 import { Gauge, Phone, Waveform } from "../components/devices";
 import { fontDisplay, fontSans } from "../fonts";
+import { HERO_GAP, HERO_NODE_WIDTH } from "../floor-layout";
+import { CASEY_QUESTIONS, isFlagged } from "../jev";
+import { TENANTS } from "../roster";
 import { theme, type TStatus } from "../theme";
 
-const ROWS: ReadonlyArray<{
-    name: string;
-    place: string;
-    due: string;
-    amount: string;
-    status: TStatus;
-}> = [
-    {
-        amount: "$2,400.00",
-        due: "Oct 1, 2026",
-        name: "John Smith",
-        place: "Sunset Properties · Unit 4",
-        status: "Overdue",
-    },
-    {
-        amount: "$960.00",
-        due: "Aug 28, 2026",
-        name: "Casey Diaz",
-        place: "9 Alder · Unit 2",
-        status: "Overdue",
-    },
-    {
-        amount: "$1,800.00",
-        due: "Sep 1, 2026",
-        name: "Avery Cole",
-        place: "14 Birch · Unit 1",
-        status: "In progress",
-    },
-    {
-        amount: "$2,400.00",
-        due: "Sep 3, 2026",
-        name: "Blake Nguyen",
-        place: "2 Cedar · Unit 3",
-        status: "Waiting on payment",
-    },
-];
+const ROWS = TENANTS;
 
 function countTo(frame: number, end: number): number {
     return Math.round(interpolate(frame, [8, 78], [0, end], {
@@ -69,14 +37,14 @@ function countTo(frame: number, end: number): number {
 export function PortfolioScene() {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
-    const importOpacity = interpolate(frame, [96, 118], [1, 0], {
+    const cardsOut = interpolate(frame, [64, 92], [0, 1], {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
     });
     const tableIn = spring({
         config: { damping: 16, stiffness: 120 },
         fps,
-        frame: frame - 100,
+        frame: frame - 98,
     });
 
     return (
@@ -105,9 +73,10 @@ export function PortfolioScene() {
             <div
                 style={ {
                     inset: 0,
-                    opacity: importOpacity,
+                    opacity: 1 - cardsOut,
                     pointerEvents: "none",
                     position: "absolute",
+                    transform: `translateY(${-56 * cardsOut}px)`,
                 } }
             >
                 <div
@@ -190,7 +159,7 @@ export function PortfolioScene() {
                     const rowIn = spring({
                         config: { damping: 14, stiffness: 140 },
                         fps,
-                        frame: frame - 108 - index * 8,
+                        frame: frame - 106 - index * 8,
                     });
                     return (
                         <div
@@ -235,12 +204,6 @@ export function WebhookScene() {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
     });
-    const pull = interpolate(frame, [0, 28], [0, 1], {
-        easing: Easing.out(Easing.cubic),
-        extrapolateRight: "clamp",
-    });
-    const scale = interpolate(pull, [0, 1], [1.04, 1]);
-    const shift = interpolate(pull, [0, 1], [40, 0]);
     const blur = interpolate(frame, [0, 22], [4, 0], { extrapolateRight: "clamp" });
     const ring = interpolate(frame, [150, 170], [0, 1], {
         extrapolateLeft: "clamp",
@@ -278,38 +241,37 @@ export function WebhookScene() {
             <div
                 style={ {
                     alignItems: "center",
-                    bottom: 300,
+                    bottom: 250,
                     display: "flex",
                     filter: blur > 0.3 ? `blur(${blur}px)` : undefined,
                     justifyContent: "center",
-                    left: 0,
+                    left: 64,
                     position: "absolute",
-                    right: 0,
-                    top: 200,
-                    transform: `translateX(${shift}px) scale(${scale})`,
+                    right: 64,
+                    top: 210,
                 } }
             >
                 <AgentChain
                     active={ steps[activeIndex] ?? "invoice" }
-                    gap={ 20 }
+                    gap={ HERO_GAP }
                     litThrough={ lit }
-                    nodeWidth={ 220 }
+                    nodeWidth={ HERO_NODE_WIDTH }
                     showHandoff
                     tenant="John Smith"
                 />
             </div>
             <div
                 style={ {
-                    bottom: 150,
-                    left: "50%",
+                    bottom: 148,
                     opacity: ring,
                     position: "absolute",
-                    transform: `translateX(-50%) translateY(${(1 - ring) * 20}px)`,
+                    right: 72,
+                    transform: `translateY(${(1 - ring) * 20}px)`,
                 } }
             >
                 <Phone
                     shake
-                    width={ 168 }
+                    width={ 150 }
                 >
                     <div style={ labelStyle }>Calling</div>
                     <div style={ { fontFamily: fontDisplay, fontSize: 26, marginTop: 12 } }>John Smith</div>
@@ -341,21 +303,21 @@ const TURNS: ReadonlyArray<{
         text: "Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties. The open balance is $2,400.00.",
     },
     {
-        at: 120,
+        at: 110,
         plan: false,
         speaker: "John Smith",
         tenant: true,
         text: "Can I split this into 4 payments?",
     },
     {
-        at: 300,
+        at: 190,
         plan: true,
         speaker: "RentRecovery · AI",
         tenant: false,
         text: "$800.00 today and $1,600.00 on the 14th. We'll mow the lawn Saturday.",
     },
     {
-        at: 430,
+        at: 280,
         plan: false,
         speaker: "John Smith",
         tenant: true,
@@ -366,12 +328,12 @@ const TURNS: ReadonlyArray<{
 export function CallScene() {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
-    const lit = frame < 120 ? 3 : frame < 220 ? 4.2 : frame < 310 ? 5.15 : 6.3;
-    const active = frame < 120 ? "disclosure" : frame < 220 ? "jev" : frame < 310 ? "policy" : "plan";
+    const lit = frame < 110 ? 3 : frame < 190 ? 4.2 : frame < 280 ? 5.15 : 6.3;
+    const active = frame < 110 ? "disclosure" : frame < 190 ? "jev" : frame < 280 ? "policy" : "plan";
     const policyIn = spring({
         config: { damping: 14, stiffness: 140 },
         fps,
-        frame: frame - 200,
+        frame: frame - 176,
     });
 
     return (
@@ -442,6 +404,7 @@ export function CallScene() {
                 </div>
                 <div
                     style={ {
+                        alignSelf: "center",
                         background: theme.surface,
                         border: `2px solid ${theme.ink}`,
                         borderRadius: theme.radiusLg,
@@ -466,24 +429,44 @@ export function CallScene() {
                     />
                     <div
                         style={ {
-                            background: theme.overdueBg,
+                            background: theme.ink,
                             borderRadius: theme.radiusMd,
-                            color: theme.overdueInk,
-                            marginTop: 22,
-                            padding: "12px 14px",
+                            marginTop: 18,
+                            padding: "14px 16px",
                         } }
                     >
-                        <div style={ labelStyle }>Asked</div>
-                        <div style={ { fontFamily: fontDisplay, fontSize: 28, marginTop: 4 } }>4 payments</div>
+                        <div
+                            style={ {
+                                color: theme.mint,
+                                fontFamily: fontSans,
+                                fontSize: 22,
+                                fontWeight: 600,
+                                opacity: 1,
+                                textDecoration: "line-through",
+                            } }
+                        >
+                            Asked: 4 payments
+                        </div>
+                        <div
+                            style={ {
+                                color: theme.mint,
+                                fontFamily: fontDisplay,
+                                fontSize: 32,
+                                marginTop: 8,
+                                opacity: 1,
+                            } }
+                        >
+                            Allowed: 2
+                        </div>
                     </div>
-                    <div style={ { fontFamily: fontDisplay, fontSize: 28, marginTop: 18 } }>
+                    <div style={ { fontFamily: fontDisplay, fontSize: 28, marginTop: 16 } }>
                         $800.00 today
                     </div>
                     <div style={ { fontFamily: fontDisplay, fontSize: 28, marginTop: 6 } }>
                         $1,600.00 on the 14th
                     </div>
-                    <div style={ { color: theme.mutedInk, fontSize: 16, marginTop: 12 } }>
-                        Lawn mowed Saturday
+                    <div style={ { color: theme.ink, fontFamily: fontSans, fontSize: 18, fontWeight: 600, marginTop: 12 } }>
+                        Landlord perk: lawn mowed Saturday
                     </div>
                 </div>
             </div>
@@ -512,82 +495,125 @@ export function HardshipScene() {
     const frame = useCurrentFrame();
     const casey = frame >= 132;
     const local = casey ? frame - 132 : frame;
-    const score = casey
+    const hardship = casey
         ? interpolate(local, [0, 36], [0.2, 0.82], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
         : interpolate(local, [0, 24], [0, 0.12], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+    const questions = casey
+        ? CASEY_QUESTIONS.map((question) => question.name === "Hardship" ? { ...question, score: hardship } : question)
+        : [
+            { name: "Hardship" as const, score: hardship },
+            { name: "Dispute" as const, score: 0.04 },
+            { name: "Distressed" as const, score: 0.06 },
+        ];
     const name = casey ? "Casey Diaz" : "John Smith";
     const place = casey ? "9 Alder · $960.00" : "Sunset Properties · $2,400.00";
-    const status: TStatus = casey && score >= 0.35 ? "Waiting on a person" : "In progress";
+    const status: TStatus = casey && isFlagged(hardship) ? "Waiting on a person" : "In progress";
 
     return (
-        <AbsoluteFill style={ { background: theme.bg, color: theme.ink, fontFamily: fontSans } }>
-            <div style={ { left: 72, position: "absolute", right: 72, top: 48 } }>
+        <AbsoluteFill
+            style={ {
+                alignItems: "center",
+                background: theme.bg,
+                color: theme.ink,
+                fontFamily: fontSans,
+                justifyContent: "center",
+                padding: "48px 72px 170px",
+            } }
+        >
+            <div style={ { width: 1720 } }>
                 <div style={ { alignItems: "center", display: "flex", justifyContent: "space-between" } }>
                     <div>
-                        <div style={ labelStyle }>Jev check · Hardship</div>
-                        <div style={ { fontFamily: fontDisplay, fontSize: 48, marginTop: 8 } }>{ name }</div>
-                        <div style={ { color: theme.mutedInk, fontSize: 18, marginTop: 4 } }>{ place }</div>
+                        <div style={ labelStyle }>Jev check</div>
+                        <div style={ { fontFamily: fontDisplay, fontSize: 56, marginTop: 8 } }>{ name }</div>
+                        <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 22, marginTop: 4 } }>{ place }</div>
                     </div>
                     <StatusBadge
                         size="lg"
                         status={ status }
                     />
                 </div>
-                <div style={ { marginTop: 36 } }>
-                    <div
-                        style={ {
-                            fontFamily: fontDisplay,
-                            fontSize: 88,
-                            fontVariantNumeric: "tabular-nums",
-                            letterSpacing: -2,
-                        } }
-                    >
-                        { score.toFixed(2) }
-                    </div>
-                    <div style={ { marginTop: 12 } }>
-                        <Gauge score={ score } />
-                    </div>
-                </div>
-                <div style={ { display: "flex", gap: 18, marginTop: 28 } }>
-                    <MiniScore
-                        label="Dispute"
-                        value={ casey ? 0.1 : 0.04 }
-                    />
-                    <MiniScore
-                        label="Distressed"
-                        value={ casey ? 0.4 : 0.06 }
-                    />
+                <div style={ { display: "flex", gap: 24, marginTop: 32 } }>
+                    { questions.map((question) => {
+                        const flagged = isFlagged(question.score);
+                        return (
+                            <div
+                                key={ question.name }
+                                style={ {
+                                    background: theme.white,
+                                    border: `2px solid ${flagged ? theme.ink : theme.mintDeep}`,
+                                    borderRadius: theme.radiusLg,
+                                    flex: 1,
+                                    padding: "22px 22px 18px",
+                                } }
+                            >
+                                <div style={ labelStyle }>{ question.name }</div>
+                                <div style={ { alignItems: "center", display: "flex", gap: 14, marginTop: 8 } }>
+                                    <div
+                                        style={ {
+                                            fontFamily: fontDisplay,
+                                            fontSize: 64,
+                                            fontVariantNumeric: "tabular-nums",
+                                            letterSpacing: -1,
+                                        } }
+                                    >
+                                        { question.score.toFixed(2) }
+                                    </div>
+                                    { flagged ? (
+                                        <div
+                                            style={ {
+                                                background: theme.mint,
+                                                borderRadius: theme.radiusPill,
+                                                color: theme.ink,
+                                                fontFamily: fontSans,
+                                                fontSize: 18,
+                                                fontWeight: 600,
+                                                padding: "6px 12px",
+                                            } }
+                                        >
+                                            Flagged
+                                        </div>
+                                    ) : null }
+                                </div>
+                                <div style={ { marginTop: 16 } }>
+                                    <Gauge
+                                        score={ question.score }
+                                        width={ 480 }
+                                    />
+                                </div>
+                            </div>
+                        );
+                    }) }
                 </div>
                 { casey ? (
-                    <div style={ { alignItems: "stretch", display: "flex", gap: 18, marginTop: 28 } }>
+                    <div style={ { display: "flex", gap: 24, marginTop: 28 } }>
                         <div
                             style={ {
                                 background: theme.surfaceSunken,
                                 borderRadius: theme.radiusMd,
-                                maxWidth: 760,
-                                padding: "16px 18px",
+                                flex: 1,
+                                padding: "18px 20px",
                             } }
                         >
                             <div style={ labelStyle }>Casey Diaz</div>
-                            <div style={ { fontSize: 22, marginTop: 6 } }>{ "I lost my job. I can't pay this." }</div>
-                            <div style={ { ...labelStyle, marginTop: 14 } }>RentRecovery · AI</div>
-                            <div style={ { fontSize: 22, marginTop: 6 } }>
+                            <div style={ { fontFamily: fontSans, fontSize: 26, marginTop: 8 } }>{ "I lost my job. I can't pay this." }</div>
+                            <div style={ { ...labelStyle, marginTop: 16 } }>RentRecovery · AI</div>
+                            <div style={ { fontFamily: fontSans, fontSize: 26, marginTop: 8 } }>
                                 A person from Sunset Properties will follow up with you.
                             </div>
                         </div>
-                        { score >= 0.35 ? (
+                        { isFlagged(hardship) ? (
                             <div
                                 style={ {
-                                    background: theme.activeBg,
+                                    background: theme.mintSoft,
                                     border: `2px solid ${theme.ink}`,
                                     borderRadius: theme.radiusLg,
-                                    padding: "16px 18px",
-                                    width: 280,
+                                    padding: "18px 20px",
+                                    width: 320,
                                 } }
                             >
                                 <div style={ labelStyle }>Handoff</div>
-                                <div style={ { fontFamily: fontDisplay, fontSize: 28, marginTop: 8 } }>Casey Diaz</div>
-                                <div style={ { marginTop: 12 } }>
+                                <div style={ { fontFamily: fontDisplay, fontSize: 32, marginTop: 8 } }>Casey Diaz</div>
+                                <div style={ { marginTop: 14 } }>
                                     <StatusBadge status="Waiting on a person" />
                                 </div>
                             </div>
@@ -596,32 +622,6 @@ export function HardshipScene() {
                 ) : null }
             </div>
         </AbsoluteFill>
-    );
-}
-
-function MiniScore({ label, value }: { label: string; value: number }) {
-    return (
-        <div
-            style={ {
-                background: theme.surface,
-                border: `1px solid ${theme.border}`,
-                borderRadius: theme.radiusLg,
-                padding: "14px 18px",
-                width: 220,
-            } }
-        >
-            <div style={ labelStyle }>{ label }</div>
-            <div
-                style={ {
-                    fontFamily: fontDisplay,
-                    fontSize: 32,
-                    fontVariantNumeric: "tabular-nums",
-                    marginTop: 6,
-                } }
-            >
-                { value.toFixed(2) }
-            </div>
-        </div>
     );
 }
 
@@ -640,15 +640,25 @@ export function PayScene() {
         <AbsoluteFill style={ { background: theme.bg, color: theme.ink, fontFamily: fontSans } }>
             <div
                 style={ {
+                    bottom: 160,
                     display: "flex",
-                    gap: 28,
+                    flexDirection: "column",
+                    gap: 24,
                     left: 56,
-                    opacity: messages,
                     position: "absolute",
-                    top: 48,
+                    right: 56,
+                    top: 40,
                 } }
             >
-                <Phone width={ 280 }>
+            <div
+                style={ {
+                    alignItems: "flex-start",
+                    display: "flex",
+                    gap: 24,
+                    opacity: messages,
+                } }
+            >
+                <Phone width={ 220 }>
                     <div style={ labelStyle }>Text</div>
                     <div
                         style={ {
@@ -668,8 +678,8 @@ export function PayScene() {
                         background: theme.surface,
                         border: `1px solid ${theme.border}`,
                         borderRadius: theme.radiusLg,
+                        flex: 1,
                         padding: "20px 22px",
-                        width: 420,
                     } }
                 >
                     <div style={ labelStyle }>Email</div>
@@ -681,21 +691,18 @@ export function PayScene() {
                         $800.00 today and $1,600.00 on the 14th.
                     </div>
                 </div>
-            </div>
-            <div
-                style={ {
-                    background: theme.surface,
-                    border: `2px solid ${theme.onMint}`,
-                    borderRadius: theme.radiusLg,
-                    opacity: checkout,
-                    padding: "28px 32px",
-                    position: "absolute",
-                    right: 72,
-                    top: 80,
-                    transform: `translateY(${(1 - checkout) * 24}px) scale(${0.96 + checkout * 0.04})`,
-                    width: 520,
-                } }
-            >
+                <div
+                    style={ {
+                        background: theme.surface,
+                        border: `2px solid ${theme.ink}`,
+                        borderRadius: theme.radiusLg,
+                        flexShrink: 0,
+                        opacity: checkout,
+                        padding: "24px 28px",
+                        transform: `translateY(${(1 - checkout) * 24}px)`,
+                        width: 420,
+                    } }
+                >
                 <div style={ labelStyle }>Checkout</div>
                 <div style={ { fontFamily: fontDisplay, fontSize: 64, letterSpacing: -1, marginTop: 8 } }>
                     $800.00
@@ -730,17 +737,15 @@ export function PayScene() {
                     { paid > 0.5 ? <Tick size={ 26 } /> : null }
                     { paid > 0.5 ? "Paid" : "Pay $800.00" }
                 </div>
+                </div>
             </div>
             <div
                 style={ {
                     background: theme.surface,
                     border: `1px solid ${theme.border}`,
                     borderRadius: theme.radiusLg,
-                    bottom: 180,
-                    left: 56,
+                    marginTop: "auto",
                     padding: "16px 20px",
-                    position: "absolute",
-                    right: 640,
                 } }
             >
                 <div style={ labelStyle }>Calls</div>
@@ -758,6 +763,7 @@ export function PayScene() {
                     </div>
                     <StatusBadge status={ planActive ? "Plan active" : "Waiting on payment" } />
                 </div>
+            </div>
             </div>
         </AbsoluteFill>
     );
@@ -815,10 +821,10 @@ export function LockupScene() {
                             <div
                                 key={ name }
                                 style={ {
-                                    background: theme.surface,
-                                    border: `2px solid ${theme.onMint}`,
+                                    background: theme.ink,
+                                    border: `2px solid ${theme.ink}`,
                                     borderRadius: theme.radiusPill,
-                                    color: theme.onMint,
+                                    color: theme.mint,
                                     fontFamily: fontSans,
                                     fontSize: 22,
                                     fontWeight: 600,
@@ -872,9 +878,9 @@ export function TeaserChainScene() {
             >
                 <AgentChain
                     active={ active }
-                    gap={ 20 }
+                    gap={ HERO_GAP }
                     litThrough={ lit }
-                    nodeWidth={ 220 }
+                    nodeWidth={ HERO_NODE_WIDTH }
                     showHandoff
                     tenant="John Smith"
                 />
@@ -906,8 +912,21 @@ export function TeaserOfferScene() {
                         padding: "22px 26px",
                     } }
                 >
-                    <div style={ labelStyle }>Asked</div>
-                    <div style={ { fontFamily: fontDisplay, fontSize: 42, marginTop: 6 } }>4 payments</div>
+                    <div
+                        style={ {
+                            color: theme.mint,
+                            fontFamily: fontSans,
+                            fontSize: 22,
+                            fontWeight: 600,
+                            opacity: 1,
+                            textDecoration: "line-through",
+                        } }
+                    >
+                        Asked: 4 payments
+                    </div>
+                    <div style={ { color: theme.mint, fontFamily: fontDisplay, fontSize: 42, marginTop: 8, opacity: 1 } }>
+                        Allowed: 2
+                    </div>
                 </div>
                 <div
                     style={ {
@@ -944,7 +963,7 @@ export function TeaserOfferScene() {
                         padding: "10px 18px",
                     } }
                 >
-                    Lawn mowed Saturday
+                    Landlord perk: lawn mowed Saturday
                 </div>
             </div>
         </AbsoluteFill>

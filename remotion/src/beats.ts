@@ -53,7 +53,7 @@ const introBeats: readonly IBeat[] = [
         from: 120,
         durationInFrames: 90,
         caption: null,
-        srt: "Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties...",
+        srt: "Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties",
     },
     {
         id: "split",
@@ -95,13 +95,13 @@ const demoStory = place(
         },
         {
             id: "webhook",
-            durationInFrames: 300,
+            durationInFrames: 210,
             caption: WEBHOOK_CAPTION,
             srt: WEBHOOK_CAPTION,
         },
         {
             id: "call",
-            durationInFrames: 540,
+            durationInFrames: 340,
             caption: CALL_CAPTION,
             srt: CALL_CAPTION,
         },
@@ -113,13 +113,13 @@ const demoStory = place(
         },
         {
             id: "pay",
-            durationInFrames: 300,
+            durationInFrames: 231,
             caption: PAY_CAPTION,
             srt: PAY_CAPTION,
         },
         {
             id: "lockup",
-            durationInFrames: 300,
+            durationInFrames: 150,
             caption: LOCKUP_CAPTION,
             srt: LOCKUP_CAPTION,
         },

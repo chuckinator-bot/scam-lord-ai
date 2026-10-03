@@ -54,3 +54,5 @@ ffmpeg -nostdin -y -hide_banner -loglevel error \
     -i "$OUT/RentRecoveryDemo.mp4" -ss 26.000 -frames:v 1 \
     "$OUT/RentRecoveryDemo-chain.png"
 echo "still RentRecoveryDemo chain @ 26.000s"
+cp "$OUT/RentRecoveryDemo-pay.png" "$OUT/RentRecoveryDemo-checkout.png"
+echo "still RentRecoveryDemo checkout"

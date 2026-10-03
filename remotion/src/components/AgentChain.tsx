@@ -6,7 +6,15 @@
  */
 
 import { fontSans } from "../fonts";
-import { AGENT_EDGES, edgeDotCenter, layoutChain, MAIN_PATH, STEP_LABEL, type INodeLayout } from "../floor-layout";
+import {
+    AGENT_EDGES,
+    edgeDotCenter,
+    handoffConnector,
+    layoutChain,
+    MAIN_PATH,
+    STEP_LABEL,
+    type INodeLayout,
+} from "../floor-layout";
 import type { TAgentStep } from "../../../src/lib/agent-floor/agents";
 import { theme } from "../theme";
 import { StatusBadge } from "./chrome";
@@ -59,21 +67,27 @@ export function AgentChain({
                     if (!from || !to) {
                         return null;
                     }
-                    const a = centerOf(from, nodeWidth, nodeHeight);
-                    const b = centerOf(to, nodeWidth, nodeHeight);
                     const targetIndex = MAIN_PATH.indexOf(target);
                     const lit = target === "handoff"
                         ? active === "handoff"
                         : targetIndex >= 0 && litThrough >= targetIndex;
+                    const ends = target === "handoff"
+                        ? handoffConnector(from, to, nodeWidth, nodeHeight)
+                        : {
+                            x1: centerOf(from, nodeWidth, nodeHeight).x,
+                            x2: centerOf(to, nodeWidth, nodeHeight).x,
+                            y1: centerOf(from, nodeWidth, nodeHeight).y,
+                            y2: centerOf(to, nodeWidth, nodeHeight).y,
+                        };
                     return (
                         <line
                             key={ `${source}-${target}` }
                             stroke={ lit ? theme.ink : theme.mintDeep }
                             strokeWidth={ lit ? 4 : 3 }
-                            x1={ a.x }
-                            x2={ b.x }
-                            y1={ a.y }
-                            y2={ b.y }
+                            x1={ ends.x1 }
+                            x2={ ends.x2 }
+                            y1={ ends.y1 }
+                            y2={ ends.y2 }
                         />
                     );
                 }) }
