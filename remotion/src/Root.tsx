@@ -8,6 +8,8 @@
 import { Composition } from "remotion";
 import { DEMO, DEMO30, FPS, HEIGHT, INTRO, TEASER, WIDTH } from "./beats";
 import { Demo30Film, DemoFilm, IntroFilm, TeaserFilm } from "./Films";
+import { Hype30Film } from "./hype30/Film";
+import { HYPE_DURATION_FRAMES } from "./hype30/beats";
 import { SubmissionFilm, submissionAssemblyProps, submissionGuideProps } from "./submission/Film";
 import { SUBMISSION_DURATION_FRAMES } from "./submission/timing";
 
@@ -62,6 +64,14 @@ export function RemotionRoot() {
                 fps={ FPS }
                 height={ HEIGHT }
                 id="RentRecoverySubmissionGuide"
+                width={ WIDTH }
+            />
+            <Composition
+                component={ Hype30Film }
+                durationInFrames={ HYPE_DURATION_FRAMES }
+                fps={ FPS }
+                height={ HEIGHT }
+                id="RentRecoveryHype30"
                 width={ WIDTH }
             />
         </>
