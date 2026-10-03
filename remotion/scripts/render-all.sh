@@ -28,8 +28,9 @@ render_one RentRecoveryTeaser
 
 node --experimental-strip-types scripts/write-srts.ts "$OUT"
 
-node --experimental-strip-types scripts/list-stills.ts | while read -r id beat frame; do
+node --experimental-strip-types scripts/list-stills.ts > /tmp/rentrecovery-stills.txt
+while read -r id beat frame; do
     seconds="$(awk -v frame="$frame" 'BEGIN { printf "%.3f", frame / 30 }')"
-    ffmpeg -y -hide_banner -loglevel error -i "$OUT/${id}.mp4" -ss "$seconds" -frames:v 1 "$OUT/${id}-${beat}.png"
+    ffmpeg -nostdin -y -hide_banner -loglevel error -i "$OUT/${id}.mp4" -ss "$seconds" -frames:v 1 "$OUT/${id}-${beat}.png"
     echo "still $id $beat @ ${seconds}s"
-done
+done < /tmp/rentrecovery-stills.txt
