@@ -8,6 +8,8 @@
 import { Composition } from "remotion";
 import { DEMO, DEMO30, FPS, HEIGHT, INTRO, TEASER, WIDTH } from "./beats";
 import { Demo30Film, DemoFilm, IntroFilm, TeaserFilm } from "./Films";
+import { SubmissionFilm, submissionAssemblyProps, submissionGuideProps } from "./submission/Film";
+import { SUBMISSION_DURATION_FRAMES } from "./submission/timing";
 
 export function RemotionRoot() {
     return (
@@ -42,6 +44,24 @@ export function RemotionRoot() {
                 fps={ FPS }
                 height={ HEIGHT }
                 id="RentRecoveryDemo30"
+                width={ WIDTH }
+            />
+            <Composition
+                component={ SubmissionFilm }
+                defaultProps={ submissionAssemblyProps }
+                durationInFrames={ SUBMISSION_DURATION_FRAMES }
+                fps={ FPS }
+                height={ HEIGHT }
+                id="RentRecoverySubmission"
+                width={ WIDTH }
+            />
+            <Composition
+                component={ SubmissionFilm }
+                defaultProps={ submissionGuideProps }
+                durationInFrames={ SUBMISSION_DURATION_FRAMES }
+                fps={ FPS }
+                height={ HEIGHT }
+                id="RentRecoverySubmissionGuide"
                 width={ WIDTH }
             />
         </>

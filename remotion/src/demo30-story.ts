@@ -9,6 +9,7 @@
 
 import { DEMO30_FLAG_LINE, DEMO30_HARDSHIP_SCORE, VOICE_LINE_MIA } from "./beats";
 import { TENANTS } from "./roster";
+import type { ICallTurn } from "./scenes/story";
 
 export const BOOK_DOLLARS = TENANTS.reduce((sum, tenant) => {
     return sum + Number(tenant.amount.replace(/[$,]/g, ""));
@@ -151,5 +152,15 @@ export const OFFER_LINES: readonly ITranscriptLine[] = [
 
 /** Local frame when the paid chip replaces the wait. */
 export const OFFER_PAID_FRAME = 72;
+
+/** The paused Demo30 composition still passes these into the shared call scene. */
+export const DEMO30_POLICY_FRAME = 44;
+export const DEMO30_TURNS: readonly ICallTurn[] = CALL_LINES.map((line) => ({
+    at: line.at,
+    plan: false,
+    speaker: line.speaker,
+    tenant: line.tenant,
+    text: line.text,
+}));
 
 export { DEMO30_FLAG_LINE, DEMO30_HARDSHIP_SCORE };

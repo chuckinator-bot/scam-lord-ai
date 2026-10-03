@@ -64,6 +64,9 @@ export const VOICE_LINE_MIA = "Hi, is this John? It's Mia from Sunset Properties
 /** Hardship line on the 30-second film. Only this score clears 0.75. */
 export const DEMO30_FLAG_LINE = 0.75;
 export const DEMO30_HARDSHIP_SCORE = 0.81;
+/** Kept so the paused 30-second composition still typechecks. */
+export const DEMO30_CASEY_ENTER_FRAME = 48;
+export const DEMO30_CASEY_SCORE_FRAMES = 12;
 
 function introBeats(voice: string, durations: readonly [number, number, number, number, number]): readonly IBeat[] {
     const [late, chase, wake, split, brand] = durations;
