@@ -34,3 +34,8 @@ while read -r id beat frame; do
     ffmpeg -nostdin -y -hide_banner -loglevel error -i "$OUT/${id}.mp4" -ss "$seconds" -frames:v 1 "$OUT/${id}-${beat}.png"
     echo "still $id $beat @ ${seconds}s"
 done < /tmp/rentrecovery-stills.txt
+
+ffmpeg -nostdin -y -hide_banner -loglevel error \
+    -i "$OUT/RentRecoveryIntro.mp4" -ss 7.500 -frames:v 1 \
+    "$OUT/RentRecoveryIntro-swap.png"
+echo "still RentRecoveryIntro swap @ 7.500s"

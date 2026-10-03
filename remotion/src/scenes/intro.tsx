@@ -9,6 +9,7 @@ import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoCon
 import { Logo, Tick } from "../components/chrome";
 import { BigAmount, Phone, Waveform } from "../components/devices";
 import { fontDisplay, fontSans } from "../fonts";
+import { overdueOnScreen, paidOnScreen, SPLIT_ENTER_START, SPLIT_EXIT_END, SPLIT_EXIT_START } from "../split-swap";
 import { theme } from "../theme";
 
 export function LateBeat() {
@@ -323,7 +324,7 @@ export function WakeBeat() {
 export function SplitBeat() {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
-    const out = interpolate(frame, [6, 16], [1, 0], {
+    const leaving = interpolate(frame, [SPLIT_EXIT_START, SPLIT_EXIT_END], [0, 1], {
         easing: Easing.in(Easing.cubic),
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
@@ -331,7 +332,7 @@ export function SplitBeat() {
     const inn = spring({
         config: { damping: 12, stiffness: 150 },
         fps,
-        frame: frame - 12,
+        frame: frame - SPLIT_ENTER_START,
     });
     return (
         <AbsoluteFill
@@ -341,45 +342,48 @@ export function SplitBeat() {
                 justifyContent: "center",
             } }
         >
-            <div
-                style={ {
-                    opacity: out,
-                    position: "absolute",
-                    transform: `scale(${1 + (1 - out) * 0.08})`,
-                    filter: `blur(${(1 - out) * 8}px)`,
-                } }
-            >
-                <BigAmount
-                    amount="$2,400"
-                    label="OVERDUE"
-                    tone="overdue"
-                />
-            </div>
-            <div
-                style={ {
-                    alignItems: "center",
-                    display: "flex",
-                    gap: 28,
-                    opacity: inn,
-                    transform: `translateY(${(1 - inn) * 30}px)`,
-                } }
-            >
-                <div style={ { position: "relative" } }>
+            { overdueOnScreen(frame) ? (
+                <div
+                    style={ {
+                        opacity: 1 - leaving,
+                        position: "absolute",
+                        transform: `translateY(${-72 * leaving}px)`,
+                    } }
+                >
                     <BigAmount
-                        amount="$800"
-                        label="PAID"
-                        tone="paid"
+                        amount="$2,400"
+                        label="OVERDUE"
+                        tone="overdue"
                     />
-                    <div style={ { position: "absolute", right: -8, top: -12 } }>
-                        <Tick size={ 54 } />
-                    </div>
                 </div>
-                <BigAmount
-                    amount="$1,600"
-                    label="SCHEDULED"
-                    tone="ink"
-                />
-            </div>
+            ) : null }
+            { paidOnScreen(frame) ? (
+                <div
+                    style={ {
+                        alignItems: "center",
+                        display: "flex",
+                        gap: 28,
+                        opacity: inn,
+                        transform: `translateY(${(1 - inn) * 30}px)`,
+                    } }
+                >
+                    <div style={ { position: "relative" } }>
+                        <BigAmount
+                            amount="$800"
+                            label="PAID"
+                            tone="paid"
+                        />
+                        <div style={ { position: "absolute", right: -8, top: -12 } }>
+                            <Tick size={ 54 } />
+                        </div>
+                    </div>
+                    <BigAmount
+                        amount="$1,600"
+                        label="SCHEDULED"
+                        tone="ink"
+                    />
+                </div>
+            ) : null }
         </AbsoluteFill>
     );
 }
