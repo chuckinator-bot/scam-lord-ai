@@ -13,6 +13,7 @@ import {
     SPLIT_ENTER_START,
     SPLIT_EXIT_END,
     SPLIT_EXIT_START,
+    SPLIT_SETTLE_FRAMES,
     splitExitFrameCount,
 } from "./split-swap";
 
@@ -36,5 +37,12 @@ describe("intro amount swap", () => {
         }
         expect(overdueOnScreen(SPLIT_EXIT_END)).toBe(false);
         expect(paidOnScreen(SPLIT_ENTER_START)).toBe(true);
+    });
+
+    it("holds the paid lines at full contrast for at least one second", () => {
+        const split = INTRO.beats.find((beat) => beat.id === "split");
+        const hold = (split?.durationInFrames ?? 0) - (SPLIT_ENTER_START + SPLIT_SETTLE_FRAMES);
+        expect(hold).toBeGreaterThanOrEqual(30);
+        expect(INTRO.durationInFrames).toBe(330);
     });
 });

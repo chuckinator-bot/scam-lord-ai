@@ -239,8 +239,8 @@ export function WebhookScene() {
         easing: Easing.out(Easing.cubic),
         extrapolateRight: "clamp",
     });
-    const scale = interpolate(pull, [0, 1], [1.28, 1]);
-    const shift = interpolate(pull, [0, 1], [220, 0]);
+    const scale = interpolate(pull, [0, 1], [1.04, 1]);
+    const shift = interpolate(pull, [0, 1], [40, 0]);
     const blur = interpolate(frame, [0, 22], [4, 0], { extrapolateRight: "clamp" });
     const ring = interpolate(frame, [150, 170], [0, 1], {
         extrapolateLeft: "clamp",
@@ -277,42 +277,46 @@ export function WebhookScene() {
             </div>
             <div
                 style={ {
+                    alignItems: "center",
+                    bottom: 300,
                     display: "flex",
                     filter: blur > 0.3 ? `blur(${blur}px)` : undefined,
                     justifyContent: "center",
                     left: 0,
                     position: "absolute",
                     right: 0,
-                    top: 250,
+                    top: 200,
                     transform: `translateX(${shift}px) scale(${scale})`,
                 } }
             >
                 <AgentChain
                     active={ steps[activeIndex] ?? "invoice" }
+                    gap={ 20 }
                     litThrough={ lit }
+                    nodeWidth={ 220 }
                     showHandoff
                     tenant="John Smith"
                 />
             </div>
             <div
                 style={ {
-                    bottom: 188,
+                    bottom: 150,
+                    left: "50%",
                     opacity: ring,
                     position: "absolute",
-                    right: 64,
-                    transform: `translateY(${(1 - ring) * 20}px)`,
+                    transform: `translateX(-50%) translateY(${(1 - ring) * 20}px)`,
                 } }
             >
                 <Phone
                     shake
-                    width={ 220 }
+                    width={ 168 }
                 >
                     <div style={ labelStyle }>Calling</div>
                     <div style={ { fontFamily: fontDisplay, fontSize: 26, marginTop: 12 } }>John Smith</div>
                     <div style={ { marginTop: 20 } }>
                         <Waveform
                             bars={ 12 }
-                            color={ theme.violet }
+                            color={ theme.ink }
                             height={ 48 }
                         />
                     </div>
@@ -381,6 +385,7 @@ export function CallScene() {
                     <AgentChain
                         active={ active }
                         litThrough={ lit }
+                        gap={ 16 }
                         nodeWidth={ 156 }
                         showHandoff={ false }
                         tenant="John Smith"
@@ -420,7 +425,7 @@ export function CallScene() {
                                     alignSelf: turn.tenant ? "flex-end" : "flex-start",
                                     background: turn.tenant ? theme.surfaceSunken : theme.surface,
                                     border: turn.plan
-                                        ? `2px solid ${theme.violet}`
+                                        ? `2px solid ${theme.ink}`
                                         : `1px solid ${theme.border}`,
                                     borderRadius: theme.radiusMd,
                                     maxWidth: 760,
@@ -438,7 +443,7 @@ export function CallScene() {
                 <div
                     style={ {
                         background: theme.surface,
-                        border: `2px solid ${theme.violet}`,
+                        border: `2px solid ${theme.ink}`,
                         borderRadius: theme.radiusLg,
                         opacity: policyIn,
                         padding: "22px 24px",
@@ -574,7 +579,7 @@ export function HardshipScene() {
                             <div
                                 style={ {
                                     background: theme.activeBg,
-                                    border: `2px solid ${theme.violet}`,
+                                    border: `2px solid ${theme.ink}`,
                                     borderRadius: theme.radiusLg,
                                     padding: "16px 18px",
                                     width: 280,
@@ -712,7 +717,7 @@ export function PayScene() {
                         alignItems: "center",
                         background: paid > 0.5 ? theme.paidBg : theme.violet,
                         borderRadius: theme.radiusMd,
-                        color: paid > 0.5 ? theme.paidInk : theme.onViolet,
+                        color: paid > 0.5 ? theme.ink : theme.white,
                         display: "flex",
                         fontSize: 18,
                         fontWeight: 600,
@@ -841,7 +846,7 @@ export function TeaserChainScene() {
     const steps = ["invoice", "workflow_start", "disclosure", "jev", "policy", "plan", "payment_link"] as const;
     const active = steps[Math.min(steps.length - 1, Math.floor(lit))] ?? "invoice";
     return (
-        <AbsoluteFill style={ { background: theme.bg } }>
+        <AbsoluteFill style={ { background: theme.bg, fontFamily: fontSans } }>
             <DotField />
             <div style={ { left: 64, position: "absolute", top: 48 } }>
                 <Logo
@@ -856,10 +861,20 @@ export function TeaserChainScene() {
                     status="In progress"
                 />
             </div>
-            <AbsoluteFill style={ { alignItems: "center", justifyContent: "center", paddingBottom: 80 } }>
+            <AbsoluteFill
+                style={ {
+                    alignItems: "center",
+                    fontFamily: fontSans,
+                    justifyContent: "center",
+                    paddingBottom: 40,
+                    paddingTop: 180,
+                } }
+            >
                 <AgentChain
                     active={ active }
+                    gap={ 20 }
                     litThrough={ lit }
+                    nodeWidth={ 220 }
                     showHandoff
                     tenant="John Smith"
                 />
@@ -897,7 +912,7 @@ export function TeaserOfferScene() {
                 <div
                     style={ {
                         background: theme.surface,
-                        border: `2px solid ${theme.violet}`,
+                        border: `2px solid ${theme.ink}`,
                         borderRadius: theme.radiusLg,
                         padding: "22px 26px",
                     } }

@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from "vitest";
 import { AGENT_EDGES, AGENT_STEPS } from "../../src/lib/agent-floor/agents";
-import { layoutChain, MAIN_PATH, nodeLabel, STEP_LABEL } from "./floor-layout";
+import { edgeDotCenter, layoutChain, MAIN_PATH, nodeLabel, STEP_LABEL } from "./floor-layout";
 
 describe("agent floor layout", () => {
     it("follows the main-path edges from the app", () => {
@@ -26,6 +26,24 @@ describe("agent floor layout", () => {
         const handoff = layout.find((node) => node.step === "handoff");
         expect(handoff?.x).toBe(jev?.x);
         expect(handoff?.y ?? 0).toBeGreaterThan(jev?.y ?? 0);
+    });
+
+    it("keeps the traveling dot in the gap before the paid card", () => {
+        const nodeWidth = 100;
+        const gap = 40;
+        const radius = 8;
+        const paidLeft = 7 * (nodeWidth + gap);
+        const mid = edgeDotCenter(6.5, nodeWidth, gap, radius);
+        expect(mid).not.toBeNull();
+        expect((mid ?? 0) + radius).toBeLessThan(paidLeft);
+        expect(edgeDotCenter(7.2, nodeWidth, gap, radius)).toBeNull();
+    });
+
+    it("pulls the handoff card close under Jev", () => {
+        const layout = layoutChain(200, 12, 110);
+        const handoff = layout.find((node) => node.step === "handoff");
+        expect(handoff?.y).toBe(110);
+        expect(handoff?.y ?? 0).toBeLessThan(200 * 0.78);
     });
 
     it("labels a node the way the floor does", () => {

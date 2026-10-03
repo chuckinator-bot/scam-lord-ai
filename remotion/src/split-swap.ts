@@ -14,6 +14,9 @@ export const SPLIT_EXIT_END = 12;
 /** Local frame when $800 PAID and $1,600 SCHEDULED may appear. Same frame as the tick. */
 export const SPLIT_ENTER_START = 12;
 
+/** Frames the paid lines take to reach full opacity after they enter. */
+export const SPLIT_SETTLE_FRAMES = 8;
+
 export function splitExitFrameCount(): number {
     return SPLIT_EXIT_END - SPLIT_EXIT_START;
 }

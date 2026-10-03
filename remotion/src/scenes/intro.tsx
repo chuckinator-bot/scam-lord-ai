@@ -9,7 +9,7 @@ import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoCon
 import { Logo, Tick } from "../components/chrome";
 import { BigAmount, Phone, Waveform } from "../components/devices";
 import { fontDisplay, fontSans } from "../fonts";
-import { overdueOnScreen, paidOnScreen, SPLIT_ENTER_START, SPLIT_EXIT_END, SPLIT_EXIT_START } from "../split-swap";
+import { overdueOnScreen, paidOnScreen, SPLIT_ENTER_START, SPLIT_EXIT_END, SPLIT_EXIT_START, SPLIT_SETTLE_FRAMES } from "../split-swap";
 import { theme } from "../theme";
 
 export function LateBeat() {
@@ -27,7 +27,7 @@ export function LateBeat() {
     });
 
     return (
-        <AbsoluteFill style={ { background: theme.yellow, color: theme.onMint } }>
+        <AbsoluteFill style={ { background: theme.ink, color: theme.mint, fontFamily: fontDisplay } }>
             <AbsoluteFill
                 style={ {
                     alignItems: "center",
@@ -62,10 +62,12 @@ export function LateBeat() {
                 <div
                     style={ {
                         alignItems: "center",
-                        background: theme.surface,
-                        border: `2px solid ${theme.onMint}`,
+                        background: theme.white,
+                        border: `2px solid ${theme.mint}`,
                         borderRadius: theme.radiusLg,
+                        color: theme.ink,
                         display: "flex",
+                        fontFamily: fontSans,
                         gap: 28,
                         padding: "18px 28px",
                     } }
@@ -93,9 +95,9 @@ export function LateBeat() {
                     </div>
                     <div
                         style={ {
-                            background: theme.overdueBg,
+                            background: theme.mint,
                             borderRadius: theme.radiusPill,
-                            color: theme.overdueInk,
+                            color: theme.ink,
                             fontFamily: fontSans,
                             fontSize: 18,
                             fontWeight: 600,
@@ -119,7 +121,7 @@ export function ChaseBeat() {
         frame: frame - 28,
     });
     return (
-        <AbsoluteFill style={ { background: theme.yellow, color: theme.onMint } }>
+        <AbsoluteFill style={ { background: theme.ink, color: theme.mint, fontFamily: fontDisplay } }>
             <div
                 style={ {
                     fontFamily: fontDisplay,
@@ -155,9 +157,10 @@ export function ChaseBeat() {
                         <div
                             key={ name }
                             style={ {
-                                background: theme.surface,
-                                border: `2px solid ${theme.onMint}`,
+                                background: theme.white,
+                                border: `2px solid ${theme.mint}`,
                                 borderRadius: theme.radiusMd,
+                                color: theme.ink,
                                 fontFamily: fontSans,
                                 padding: "12px 16px",
                                 transform: `rotate(${index === 1 ? 2.5 : -2}deg)`,
@@ -188,7 +191,7 @@ export function ChaseBeat() {
                     <div style={ { color: theme.mutedInk, fontSize: 16, marginTop: 8 } }>Sunset Properties</div>
                     <div style={ { marginTop: 36 } }>
                         <Waveform
-                            color={ theme.overdueInk }
+                            color={ theme.ink }
                             height={ 48 }
                         />
                     </div>
@@ -259,9 +262,9 @@ export function WakeBeat() {
             >
                 <div
                     style={ {
-                        background: theme.overdueBg,
+                        background: theme.mint,
                         borderRadius: theme.radiusPill,
-                        color: theme.overdueInk,
+                        color: theme.ink,
                         display: "inline-block",
                         fontFamily: fontSans,
                         fontSize: 22,
@@ -300,7 +303,7 @@ export function WakeBeat() {
                     <div style={ { marginTop: 28 } }>
                         <Waveform
                             bars={ 16 }
-                            color={ theme.violet }
+                            color={ theme.ink }
                             height={ 64 }
                         />
                     </div>
@@ -323,22 +326,27 @@ export function WakeBeat() {
 
 export function SplitBeat() {
     const frame = useCurrentFrame();
-    const { fps } = useVideoConfig();
     const leaving = interpolate(frame, [SPLIT_EXIT_START, SPLIT_EXIT_END], [0, 1], {
         easing: Easing.in(Easing.cubic),
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
     });
-    const inn = spring({
-        config: { damping: 12, stiffness: 150 },
-        fps,
-        frame: frame - SPLIT_ENTER_START,
-    });
+    const settled = interpolate(
+        frame,
+        [SPLIT_ENTER_START, SPLIT_ENTER_START + SPLIT_SETTLE_FRAMES],
+        [0, 1],
+        {
+            easing: Easing.out(Easing.cubic),
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+        },
+    );
     return (
         <AbsoluteFill
             style={ {
                 alignItems: "center",
                 background: theme.bg,
+                fontFamily: fontSans,
                 justifyContent: "center",
             } }
         >
@@ -363,8 +371,8 @@ export function SplitBeat() {
                         alignItems: "center",
                         display: "flex",
                         gap: 28,
-                        opacity: inn,
-                        transform: `translateY(${(1 - inn) * 30}px)`,
+                        opacity: settled,
+                        transform: `translateY(${(1 - settled) * 30}px)`,
                     } }
                 >
                     <div style={ { position: "relative" } }>

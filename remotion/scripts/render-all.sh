@@ -39,3 +39,18 @@ ffmpeg -nostdin -y -hide_banner -loglevel error \
     -i "$OUT/RentRecoveryIntro.mp4" -ss 7.500 -frames:v 1 \
     "$OUT/RentRecoveryIntro-swap.png"
 echo "still RentRecoveryIntro swap @ 7.500s"
+
+ffmpeg -nostdin -y -hide_banner -loglevel error \
+    -i "$OUT/RentRecoveryIntro.mp4" -ss 0.500 -frames:v 1 \
+    "$OUT/RentRecoveryIntro-0.5s.png"
+echo "still RentRecoveryIntro alarm @ 0.500s"
+
+ffmpeg -nostdin -y -hide_banner -loglevel error \
+    -i "$OUT/RentRecoveryIntro.mp4" -ss 8.500 -frames:v 1 \
+    "$OUT/RentRecoveryIntro-held.png"
+echo "still RentRecoveryIntro held @ 8.500s"
+
+ffmpeg -nostdin -y -hide_banner -loglevel error \
+    -i "$OUT/RentRecoveryDemo.mp4" -ss 26.000 -frames:v 1 \
+    "$OUT/RentRecoveryDemo-chain.png"
+echo "still RentRecoveryDemo chain @ 26.000s"

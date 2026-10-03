@@ -120,7 +120,7 @@ export function Gauge({
             >
                 <div
                     style={ {
-                        background: hot ? theme.overdueInk : theme.paidInk,
+                        background: hot ? theme.ink : theme.mint,
                         borderRadius: theme.radiusPill,
                         bottom: 4,
                         left: 4,
@@ -176,21 +176,18 @@ export function BigAmount({
     label: string;
     tone: "overdue" | "paid" | "ink";
 }) {
-    const color = tone === "overdue"
-        ? theme.overdueInk
-        : tone === "paid"
-            ? theme.paidInk
-            : theme.ink;
+    const color = tone === "overdue" ? theme.mint : theme.ink;
     const background = tone === "overdue"
-        ? theme.overdueBg
+        ? theme.ink
         : tone === "paid"
-            ? theme.paidBg
-            : theme.surface;
+            ? theme.mint
+            : theme.white;
+    const border = tone === "overdue" ? theme.mint : theme.ink;
     return (
         <div
             style={ {
                 background,
-                border: `2px solid ${theme.onMint}`,
+                border: `2px solid ${border}`,
                 borderRadius: theme.radiusLg,
                 padding: "28px 36px",
             } }

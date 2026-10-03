@@ -92,7 +92,7 @@ export function LockIcon() {
     );
 }
 
-export function Tick({ size = 28, color = theme.paidInk }: { size?: number; color?: string }) {
+export function Tick({ size = 28, color = theme.ink }: { size?: number; color?: string }) {
     return (
         <svg
             aria-hidden="true"
@@ -104,7 +104,7 @@ export function Tick({ size = 28, color = theme.paidInk }: { size?: number; colo
             <circle
                 cx="16"
                 cy="16"
-                fill={ theme.paidBg }
+                fill={ theme.white }
                 r="15"
                 stroke={ color }
                 strokeWidth="2"
@@ -229,8 +229,10 @@ export function AppShell({
                         <div
                             key={ item }
                             style={ {
+                                background: selected ? theme.mintSoft : "transparent",
                                 borderRadius: theme.radiusMd,
-                                color: selected ? theme.violet : theme.ink,
+                                color: theme.ink,
+                                fontFamily: fontSans,
                                 fontSize: 18,
                                 fontWeight: 600,
                                 padding: "12px 16px",
@@ -311,7 +313,16 @@ export function AgentBanner({
                 >
                     RentRecovery activated
                 </div>
-                <div style={ { fontSize: 16, marginTop: 4, opacity: 0.9 } }>{ detail }</div>
+                <div
+                    style={ {
+                        fontFamily: fontSans,
+                        fontSize: 20,
+                        fontWeight: 600,
+                        marginTop: 6,
+                    } }
+                >
+                    { detail }
+                </div>
             </div>
             <StatusBadge status={ status } />
         </div>

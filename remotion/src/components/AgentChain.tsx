@@ -6,16 +6,16 @@
  */
 
 import { fontSans } from "../fonts";
-import { AGENT_EDGES, layoutChain, MAIN_PATH, STEP_LABEL, type INodeLayout } from "../floor-layout";
+import { AGENT_EDGES, edgeDotCenter, layoutChain, MAIN_PATH, STEP_LABEL, type INodeLayout } from "../floor-layout";
 import type { TAgentStep } from "../../../src/lib/agent-floor/agents";
 import { theme } from "../theme";
 import { StatusBadge } from "./chrome";
 import type { TStatus } from "../theme";
 
-const NODE_H = 88;
+const DOT_RADIUS = 6;
 
-function centerOf(node: INodeLayout, nodeWidth: number): { x: number; y: number } {
-    return { x: node.x + nodeWidth / 2, y: node.y + NODE_H / 2 };
+function centerOf(node: INodeLayout, nodeWidth: number, nodeHeight: number): { x: number; y: number } {
+    return { x: node.x + nodeWidth / 2, y: node.y + nodeHeight / 2 };
 }
 
 export function AgentChain({
@@ -24,6 +24,7 @@ export function AgentChain({
     active,
     showHandoff = true,
     nodeWidth = 168,
+    gap = 28,
     badge,
 }: {
     tenant: string;
@@ -31,16 +32,22 @@ export function AgentChain({
     active: TAgentStep | null;
     showHandoff?: boolean;
     nodeWidth?: number;
+    gap?: number;
     badge?: TStatus;
 }) {
-    const gap = 16;
-    const layout = layoutChain(nodeWidth, gap).filter((node) => showHandoff || node.step !== "handoff");
+    const nodeHeight = Math.round(nodeWidth * 0.54);
+    const handoffY = nodeHeight + 16;
+    const layout = layoutChain(nodeWidth, gap, handoffY).filter((node) => showHandoff || node.step !== "handoff");
     const width = (MAIN_PATH.length - 1) * (nodeWidth + gap) + nodeWidth;
-    const height = showHandoff ? NODE_H + nodeWidth * 0.78 + 8 : NODE_H;
+    const height = showHandoff ? handoffY + nodeHeight : nodeHeight;
     const byStep = new Map(layout.map((node) => [node.step, node]));
+    const labelSize = Math.max(18, Math.round(nodeWidth * 0.1));
+    const nameSize = Math.max(16, Math.round(nodeWidth * 0.078));
+    const dotX = edgeDotCenter(litThrough, nodeWidth, gap, DOT_RADIUS);
+    const dotRow = byStep.get("invoice");
 
     return (
-        <div style={ { height, position: "relative", width } }>
+        <div style={ { fontFamily: fontSans, height, position: "relative", width } }>
             <svg
                 height={ height }
                 style={ { left: 0, position: "absolute", top: 0 } }
@@ -52,8 +59,8 @@ export function AgentChain({
                     if (!from || !to) {
                         return null;
                     }
-                    const a = centerOf(from, nodeWidth);
-                    const b = centerOf(to, nodeWidth);
+                    const a = centerOf(from, nodeWidth, nodeHeight);
+                    const b = centerOf(to, nodeWidth, nodeHeight);
                     const targetIndex = MAIN_PATH.indexOf(target);
                     const lit = target === "handoff"
                         ? active === "handoff"
@@ -61,8 +68,8 @@ export function AgentChain({
                     return (
                         <line
                             key={ `${source}-${target}` }
-                            stroke={ lit ? theme.violet : theme.borderStrong }
-                            strokeWidth={ lit ? 3 : 2 }
+                            stroke={ lit ? theme.ink : theme.mintDeep }
+                            strokeWidth={ lit ? 4 : 3 }
                             x1={ a.x }
                             x2={ b.x }
                             y1={ a.y }
@@ -81,15 +88,13 @@ export function AgentChain({
                     <div
                         key={ node.step }
                         style={ {
-                            background: current ? theme.activeBg : theme.surface,
-                            border: current
-                                ? `2px solid ${theme.violet}`
-                                : `1px solid ${lit ? theme.borderStrong : theme.border}`,
+                            background: current ? theme.mint : theme.white,
+                            border: `2px solid ${current || lit ? theme.ink : theme.mintDeep}`,
                             borderRadius: theme.radiusLg,
-                            height: NODE_H,
+                            height: nodeHeight,
                             left: node.x,
-                            opacity: lit || current ? 1 : 0.4,
-                            padding: "12px 12px 10px",
+                            opacity: lit || current ? 1 : 0.45,
+                            padding: "14px 14px 12px",
                             position: "absolute",
                             top: node.y,
                             width: nodeWidth,
@@ -99,76 +104,45 @@ export function AgentChain({
                             style={ {
                                 color: theme.ink,
                                 fontFamily: fontSans,
-                                fontSize: 15,
+                                fontSize: labelSize,
                                 fontWeight: 600,
-                                lineHeight: "18px",
+                                lineHeight: "22px",
                             } }
                         >
                             { STEP_LABEL[node.step] }
                         </div>
                         <div
                             style={ {
-                                color: theme.mutedInk,
+                                color: theme.inkSoft,
                                 fontFamily: fontSans,
-                                fontSize: 13,
-                                lineHeight: "18px",
-                                marginTop: 4,
+                                fontSize: nameSize,
+                                lineHeight: "22px",
+                                marginTop: 6,
                             } }
                         >
                             { tenant }
                         </div>
                         { current && badge ? (
-                            <div style={ { marginTop: 6 } }>
+                            <div style={ { marginTop: 8 } }>
                                 <StatusBadge status={ badge } />
                             </div>
                         ) : null }
                     </div>
                 );
             }) }
-            { litThrough > 0 && litThrough < MAIN_PATH.length ? (
-                <Pulse
-                    litThrough={ litThrough }
-                    nodeWidth={ nodeWidth }
-                    nodes={ byStep }
+            { dotX !== null && dotRow ? (
+                <div
+                    style={ {
+                        background: theme.ink,
+                        borderRadius: theme.radiusPill,
+                        height: DOT_RADIUS * 2,
+                        left: dotX - DOT_RADIUS,
+                        position: "absolute",
+                        top: dotRow.y + nodeHeight / 2 - DOT_RADIUS,
+                        width: DOT_RADIUS * 2,
+                    } }
                 />
             ) : null }
         </div>
-    );
-}
-
-function Pulse({
-    litThrough,
-    nodeWidth,
-    nodes,
-}: {
-    litThrough: number;
-    nodeWidth: number;
-    nodes: Map<TAgentStep, INodeLayout>;
-}) {
-    const index = Math.min(MAIN_PATH.length - 1, Math.max(0, litThrough));
-    const fromStep = MAIN_PATH[Math.floor(index)] ?? "invoice";
-    const toStep = MAIN_PATH[Math.min(MAIN_PATH.length - 1, Math.floor(index) + 1)] ?? fromStep;
-    const fromNode = nodes.get(fromStep);
-    const toNode = nodes.get(toStep);
-    if (!fromNode || !toNode) {
-        return null;
-    }
-    const blend = index - Math.floor(index);
-    const a = centerOf(fromNode, nodeWidth);
-    const b = centerOf(toNode, nodeWidth);
-    const x = a.x + (b.x - a.x) * blend;
-    const y = a.y + (b.y - a.y) * blend;
-    return (
-        <div
-            style={ {
-                background: theme.violet,
-                borderRadius: theme.radiusPill,
-                height: 16,
-                left: x - 8,
-                position: "absolute",
-                top: y - 8,
-                width: 16,
-            } }
-        />
     );
 }

@@ -8,6 +8,7 @@
 import type { ReactNode } from "react";
 import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
 import { beatById, DEMO, INTRO, TEASER, type IFilm } from "./beats";
+import { fontSans } from "./fonts";
 import { Caption, Snap } from "./components/chrome";
 import { BrandBeat, ChaseBeat, LateBeat, SplitBeat, WakeBeat } from "./scenes/intro";
 import {
@@ -86,7 +87,8 @@ function IntroBeats() {
 
 export function IntroFilm() {
     return (
-        <AbsoluteFill>
+        <AbsoluteFill style={ { fontFamily: fontSans } }>
+            <style>{ `* { font-family: ${fontSans}, sans-serif; }` }</style>
             <Audio src={ staticFile("audio/intro.wav") } />
             <IntroBeats />
         </AbsoluteFill>
@@ -95,7 +97,8 @@ export function IntroFilm() {
 
 export function DemoFilm() {
     return (
-        <AbsoluteFill>
+        <AbsoluteFill style={ { fontFamily: fontSans } }>
+            <style>{ `* { font-family: ${fontSans}, sans-serif; }` }</style>
             <Audio src={ staticFile("audio/demo.wav") } />
             <IntroBeats />
             <Beat
@@ -142,7 +145,8 @@ export function DemoFilm() {
 
 export function TeaserFilm() {
     return (
-        <AbsoluteFill>
+        <AbsoluteFill style={ { fontFamily: fontSans } }>
+            <style>{ `* { font-family: ${fontSans}, sans-serif; }` }</style>
             <Audio src={ staticFile("audio/teaser.wav") } />
             <IntroBeats />
             <Beat
