@@ -42,13 +42,13 @@ export interface INodeLayout {
     y: number;
 }
 
-/** Hero chain is 1.25x the original 168px card, with room for a 64px side margin. */
-export const HERO_NODE_WIDTH = 210;
-export const HERO_GAP = 16;
+/** Nine step cards, matching the React Flow pitch, with room for a 64px side margin. */
+export const HERO_NODE_WIDTH = 168;
+export const HERO_GAP = 20;
 export const FRAME_WIDTH = 1920;
 
-export function chainWidth(nodeWidth: number, gap: number): number {
-    return (MAIN_PATH.length - 1) * (nodeWidth + gap) + nodeWidth;
+export function chainWidth(nodeWidth: number, gap: number, count = AGENT_STEPS.length): number {
+    return (count - 1) * (nodeWidth + gap) + nodeWidth;
 }
 
 export function chainSideMargin(nodeWidth: number, gap: number, frameWidth = FRAME_WIDTH): number {
@@ -62,14 +62,6 @@ export interface IConnector {
     y2: number;
 }
 
-/**
- * Handoff edge from the bottom center of Jev to the top center of Handoff.
- * Both ends sit on the card edges, so the stroke does not enter either card.
- * @param jev - Jev card layout.
- * @param handoff - Handoff card layout.
- * @param nodeWidth - Card width in pixels.
- * @param nodeHeight - Card height in pixels.
- */
 /**
  * Horizontal edge from the right edge of the source card to the left edge of the target.
  * Both ends sit just outside the cards, so the stroke does not enter either card.
@@ -93,40 +85,47 @@ export function edgeConnector(
     };
 }
 
-export function handoffConnector(
-    jev: INodeLayout,
-    handoff: INodeLayout,
+export interface IBranchConnector extends IConnector {
+    /** Y of the run that passes under the row, outside every card. */
+    readonly ySpan: number;
+}
+
+/**
+ * Jev to Handoff when Handoff sits at the end of the row.
+ * The run leaves Jev at its right edge, passes under the cards, and enters Handoff at its left edge.
+ * @param from - Jev card layout.
+ * @param to - Handoff card layout.
+ * @param nodeWidth - Card width in pixels.
+ * @param nodeHeight - Card height in pixels.
+ */
+export function branchConnector(
+    from: INodeLayout,
+    to: INodeLayout,
     nodeWidth: number,
     nodeHeight: number,
-): IConnector {
+): IBranchConnector {
     const inset = 2;
+    const y = from.y + nodeHeight / 2;
     return {
-        x1: jev.x + nodeWidth / 2,
-        x2: handoff.x + nodeWidth / 2,
-        y1: jev.y + nodeHeight + inset,
-        y2: handoff.y - inset,
+        x1: from.x + nodeWidth + inset,
+        x2: to.x - inset,
+        y1: y,
+        y2: to.y + nodeHeight / 2,
+        ySpan: Math.max(from.y, to.y) + nodeHeight + 14,
     };
 }
 
 /**
  * @param nodeWidth - Card width in pixels.
- * @param gap - Horizontal gap between main-path cards.
- * @param handoffY - Top of the handoff card. Kept close under the main row.
- * @returns One layout entry per AGENT_STEPS value. Handoff sits under Jev.
+ * @param gap - Horizontal gap between cards.
+ * @returns One layout entry per AGENT_STEPS value, left to right, including Handoff.
  */
-export function layoutChain(nodeWidth: number, gap: number, handoffY = 108): INodeLayout[] {
-    const nodes: INodeLayout[] = MAIN_PATH.map((step, index) => ({
+export function layoutChain(nodeWidth: number, gap: number): INodeLayout[] {
+    return AGENT_STEPS.map((step, index) => ({
         step,
         x: index * (nodeWidth + gap),
         y: 0,
     }));
-    const jev = nodes.find((node) => node.step === "jev");
-    nodes.push({
-        step: "handoff",
-        x: jev?.x ?? 0,
-        y: handoffY,
-    });
-    return nodes;
 }
 
 /**

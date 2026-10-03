@@ -8,9 +8,9 @@
 import { fontSans } from "../fonts";
 import {
     AGENT_EDGES,
+    branchConnector,
     edgeConnector,
     edgeDotCenter,
-    handoffConnector,
     layoutChain,
     MAIN_PATH,
     STEP_LABEL,
@@ -39,16 +39,17 @@ export function AgentChain({
     gap?: number;
     badge?: TStatus;
 }) {
-    const nodeHeight = Math.round(nodeWidth * 0.54);
-    const handoffY = nodeHeight + 16;
-    const layout = layoutChain(nodeWidth, gap, handoffY).filter((node) => showHandoff || node.step !== "handoff");
-    const width = (MAIN_PATH.length - 1) * (nodeWidth + gap) + nodeWidth;
-    const height = showHandoff ? handoffY + nodeHeight : nodeHeight;
+    const nodeHeight = Math.max(72, Math.round(nodeWidth * 0.46));
+    const layout = layoutChain(nodeWidth, gap).filter((node) => showHandoff || node.step !== "handoff");
+    const width = Math.max(...layout.map((node) => node.x)) + nodeWidth;
+    const height = nodeHeight + (showHandoff ? 28 : 0);
     const byStep = new Map(layout.map((node) => [node.step, node]));
     const labelSize = Math.max(18, Math.round(nodeWidth * 0.1));
     const nameSize = Math.max(16, Math.round(nodeWidth * 0.078));
     const dotX = edgeDotCenter(litThrough, nodeWidth, gap, DOT_RADIUS);
     const dotRow = byStep.get("invoice");
+    const arrowId = `chain-arrow-${nodeWidth}`;
+    const arrowMutedId = `chain-arrow-muted-${nodeWidth}`;
 
     return (
         <div style={ { fontFamily: fontSans, height, position: "relative", width } }>
@@ -57,6 +58,34 @@ export function AgentChain({
                 style={ { left: 0, position: "absolute", top: 0 } }
                 width={ width }
             >
+                <defs>
+                    <marker
+                        id={ arrowId }
+                        markerHeight="8"
+                        markerWidth="8"
+                        orient="auto"
+                        refX="7"
+                        refY="4"
+                    >
+                        <path
+                            d="M0,0 L8,4 L0,8 Z"
+                            fill={ theme.ink }
+                        />
+                    </marker>
+                    <marker
+                        id={ arrowMutedId }
+                        markerHeight="8"
+                        markerWidth="8"
+                        orient="auto"
+                        refX="7"
+                        refY="4"
+                    >
+                        <path
+                            d="M0,0 L8,4 L0,8 Z"
+                            fill={ theme.mintDeep }
+                        />
+                    </marker>
+                </defs>
                 { AGENT_EDGES.map(([source, target]) => {
                     const from = byStep.get(source);
                     const to = byStep.get(target);
@@ -67,14 +96,28 @@ export function AgentChain({
                     const lit = target === "handoff"
                         ? active === "handoff"
                         : targetIndex >= 0 && litThrough >= targetIndex;
-                    const ends = target === "handoff"
-                        ? handoffConnector(from, to, nodeWidth, nodeHeight)
-                        : edgeConnector(from, to, nodeWidth, nodeHeight);
+                    const stroke = lit ? theme.ink : theme.mintDeep;
+                    const marker = lit ? `url(#${arrowId})` : `url(#${arrowMutedId})`;
+                    if (target === "handoff") {
+                        const branch = branchConnector(from, to, nodeWidth, nodeHeight);
+                        return (
+                            <polyline
+                                fill="none"
+                                key={ `${source}-${target}` }
+                                markerEnd={ marker }
+                                points={ `${branch.x1},${branch.y1} ${branch.x1},${branch.ySpan} ${branch.x2},${branch.ySpan} ${branch.x2},${branch.y2}` }
+                                stroke={ stroke }
+                                strokeWidth={ lit ? 3 : 2 }
+                            />
+                        );
+                    }
+                    const ends = edgeConnector(from, to, nodeWidth, nodeHeight);
                     return (
                         <line
                             key={ `${source}-${target}` }
-                            stroke={ lit ? theme.ink : theme.mintDeep }
-                            strokeWidth={ lit ? 4 : 3 }
+                            markerEnd={ marker }
+                            stroke={ stroke }
+                            strokeWidth={ lit ? 3 : 2 }
                             x1={ ends.x1 }
                             x2={ ends.x2 }
                             y1={ ends.y1 }
@@ -93,13 +136,15 @@ export function AgentChain({
                     <div
                         key={ node.step }
                         style={ {
-                            background: current ? theme.mint : theme.white,
-                            border: `2px solid ${current || lit ? theme.ink : theme.mintDeep}`,
-                            borderRadius: theme.radiusLg,
+                            background: theme.white,
+                            border: current
+                                ? `2px solid ${theme.violet}`
+                                : `1px solid ${lit ? theme.ink : theme.border}`,
+                            borderRadius: theme.radiusMd,
+                            boxShadow: "0 1px 2px rgba(16, 36, 27, 0.08)",
                             height: nodeHeight,
                             left: node.x,
-                            opacity: lit || current ? 1 : 0.45,
-                            padding: "14px 14px 12px",
+                            padding: "12px 14px 10px",
                             position: "absolute",
                             top: node.y,
                             width: nodeWidth,
@@ -107,25 +152,52 @@ export function AgentChain({
                     >
                         <div
                             style={ {
-                                color: theme.ink,
-                                fontFamily: fontSans,
-                                fontSize: labelSize,
-                                fontWeight: 600,
-                                lineHeight: "22px",
+                                background: theme.mutedInk,
+                                border: `1px solid ${theme.border}`,
+                                borderRadius: theme.radiusPill,
+                                height: 10,
+                                left: -5,
+                                position: "absolute",
+                                top: nodeHeight / 2 - 5,
+                                width: 10,
                             } }
-                        >
-                            { STEP_LABEL[node.step] }
-                        </div>
+                        />
                         <div
                             style={ {
-                                color: theme.inkSoft,
+                                background: theme.mutedInk,
+                                border: `1px solid ${theme.border}`,
+                                borderRadius: theme.radiusPill,
+                                height: 10,
+                                position: "absolute",
+                                right: -5,
+                                top: nodeHeight / 2 - 5,
+                                width: 10,
+                            } }
+                        />
+                        <div
+                            style={ {
+                                color: theme.mutedInk,
                                 fontFamily: fontSans,
                                 fontSize: nameSize,
-                                lineHeight: "22px",
-                                marginTop: 6,
+                                fontWeight: 600,
+                                letterSpacing: 1.1,
+                                lineHeight: "16px",
+                                textTransform: "uppercase",
                             } }
                         >
                             { tenant }
+                        </div>
+                        <div
+                            style={ {
+                                color: theme.ink,
+                                fontFamily: fontSans,
+                                fontSize: labelSize,
+                                fontWeight: current ? 600 : 500,
+                                lineHeight: "20px",
+                                marginTop: 4,
+                            } }
+                        >
+                            { STEP_LABEL[node.step] }
                         </div>
                         { current && badge ? (
                             <div style={ { marginTop: 8 } }>

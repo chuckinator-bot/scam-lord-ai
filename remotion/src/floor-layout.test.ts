@@ -9,9 +9,9 @@ import { describe, expect, it } from "vitest";
 import { AGENT_EDGES, AGENT_STEPS } from "../../src/lib/agent-floor/agents";
 import {
     chainSideMargin,
+    branchConnector,
     edgeConnector,
     edgeDotCenter,
-    handoffConnector,
     HERO_GAP,
     HERO_NODE_WIDTH,
     layoutChain,
@@ -30,13 +30,13 @@ describe("agent floor layout", () => {
         expect(AGENT_EDGES).toContainEqual(["jev", "handoff"]);
     });
 
-    it("places every agent step, with handoff under Jev", () => {
+    it("places every agent step on one row, handoff after paid", () => {
         const layout = layoutChain(160, 20);
-        expect(layout.map((node) => node.step).sort()).toEqual([...AGENT_STEPS].sort());
-        const jev = layout.find((node) => node.step === "jev");
+        expect(layout.map((node) => node.step)).toEqual([...AGENT_STEPS]);
+        const paid = layout.find((node) => node.step === "paid");
         const handoff = layout.find((node) => node.step === "handoff");
-        expect(handoff?.x).toBe(jev?.x);
-        expect(handoff?.y ?? 0).toBeGreaterThan(jev?.y ?? 0);
+        expect(handoff?.y).toBe(0);
+        expect(handoff?.x).toBe((paid?.x ?? 0) + 160 + 20);
     });
 
     it("keeps the traveling dot in the gap before the paid card", () => {
@@ -50,23 +50,16 @@ describe("agent floor layout", () => {
         expect(edgeDotCenter(7.2, nodeWidth, gap, radius)).toBeNull();
     });
 
-    it("pulls the handoff card close under Jev", () => {
-        const layout = layoutChain(200, 12, 110);
-        const handoff = layout.find((node) => node.step === "handoff");
-        expect(handoff?.y).toBe(110);
-        expect(handoff?.y ?? 0).toBeLessThan(200 * 0.78);
-    });
-
     it("leaves at least 64px on each side of the hero chain", () => {
         expect(chainSideMargin(HERO_NODE_WIDTH, HERO_GAP)).toBeGreaterThanOrEqual(64);
-        expect(HERO_NODE_WIDTH / 168).toBeCloseTo(1.25, 2);
+        expect(HERO_NODE_WIDTH).toBe(168);
     });
 
     it("stops main-path connectors on the card edges", () => {
         const nodeWidth = 156;
         const gap = 16;
         const nodeHeight = 84;
-        const layout = layoutChain(nodeWidth, gap, 100);
+        const layout = layoutChain(nodeWidth, gap);
         const plan = layout.find((node) => node.step === "plan");
         const link = layout.find((node) => node.step === "payment_link");
         const paid = layout.find((node) => node.step === "paid");
@@ -80,17 +73,16 @@ describe("agent floor layout", () => {
         expect(toLink.y1).toBe(nodeHeight / 2);
     });
 
-    it("stops the handoff connector on the card edges", () => {
-        const layout = layoutChain(HERO_NODE_WIDTH, HERO_GAP, 140);
+    it("routes the handoff connector under the row and outside the cards", () => {
+        const layout = layoutChain(HERO_NODE_WIDTH, HERO_GAP);
         const jev = layout.find((node) => node.step === "jev");
         const handoff = layout.find((node) => node.step === "handoff");
-        const nodeHeight = 110;
-        const edge = handoffConnector(jev!, handoff!, HERO_NODE_WIDTH, nodeHeight);
-        expect(edge.y1).toBeGreaterThanOrEqual((jev?.y ?? 0) + nodeHeight);
-        expect(edge.y2).toBeLessThanOrEqual(handoff?.y ?? 0);
-        expect(edge.y2).toBeGreaterThan(edge.y1);
-        expect(edge.x1).toBe((jev?.x ?? 0) + HERO_NODE_WIDTH / 2);
-        expect(edge.x2).toBe((handoff?.x ?? 0) + HERO_NODE_WIDTH / 2);
+        const nodeHeight = 80;
+        const edge = branchConnector(jev!, handoff!, HERO_NODE_WIDTH, nodeHeight);
+        expect(edge.x1).toBeGreaterThanOrEqual((jev?.x ?? 0) + HERO_NODE_WIDTH);
+        expect(edge.x2).toBeLessThanOrEqual(handoff?.x ?? 0);
+        expect(edge.ySpan).toBeGreaterThan(nodeHeight);
+        expect(edge.y1).toBeLessThan(edge.ySpan);
     });
 
     it("labels a node the way the floor does", () => {

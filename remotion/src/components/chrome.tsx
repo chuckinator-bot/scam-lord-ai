@@ -184,17 +184,13 @@ export function Snap({
     );
 }
 
-const NAV = ["Connection", "Portfolio", "Calls", "Settings", "Billing"] as const;
-
-export type TSection = (typeof NAV)[number];
+const NAV = ["New Chat"] as const;
 
 export function AppShell({
-    section,
     title,
     children,
     extra,
 }: {
-    section: TSection;
     title: string;
     children: ReactNode;
     extra?: ReactNode;
@@ -223,25 +219,23 @@ export function AppShell({
                         wordmarkSize={ 24 }
                     />
                 </div>
-                { NAV.map((item) => {
-                    const selected = item === section;
-                    return (
-                        <div
-                            key={ item }
-                            style={ {
-                                background: selected ? theme.mintSoft : "transparent",
-                                borderRadius: theme.radiusMd,
-                                color: theme.ink,
-                                fontFamily: fontSans,
-                                fontSize: 18,
-                                fontWeight: 600,
-                                padding: "12px 16px",
-                            } }
-                        >
-                            { item }
-                        </div>
-                    );
-                }) }
+                { NAV.map((item) => (
+                    <div
+                        key={ item }
+                        style={ {
+                            borderRadius: theme.radiusMd,
+                            color: theme.ink,
+                            fontFamily: fontSans,
+                            fontSize: 18,
+                            fontWeight: 600,
+                            padding: "12px 16px",
+                        } }
+                    >
+                        { item }
+                    </div>
+                )) }
+                <div style={ { ...labelStyle, marginTop: 18, paddingLeft: 16 } }>Navigate</div>
+                <div style={ { ...labelStyle, marginTop: 18, paddingLeft: 16 } }>Recents</div>
             </aside>
             <main
                 style={ {

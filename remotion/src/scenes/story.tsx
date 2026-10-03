@@ -72,7 +72,6 @@ export function PortfolioScene() {
                     Row-level security
                 </div>
             ) }
-            section="Portfolio"
             title="Portfolio"
         >
             <div
@@ -149,16 +148,14 @@ export function PortfolioScene() {
                     style={ {
                         background: theme.surfaceSunken,
                         display: "grid",
-                        gridTemplateColumns: "1.2fr 1.6fr 0.8fr 0.7fr 1fr",
+                        gridTemplateColumns: "1fr auto auto",
                         padding: "12px 20px",
                         ...labelStyle,
                     } }
                 >
-                    <span>Tenant</span>
-                    <span>Property</span>
-                    <span>Due</span>
+                    <span>Tenancy</span>
                     <span style={ { textAlign: "right" } }>Amount</span>
-                    <span style={ { textAlign: "right" } }>Status</span>
+                    <span>Status</span>
                 </div>
                 { ROWS.map((row, index) => {
                     const rowIn = spring({
@@ -173,14 +170,16 @@ export function PortfolioScene() {
                                 alignItems: "center",
                                 borderTop: `1px solid ${theme.border}`,
                                 display: "grid",
-                                gridTemplateColumns: "1.2fr 1.6fr 0.8fr 0.7fr 1fr",
+                                gridTemplateColumns: "1fr auto auto",
                                 opacity: rowIn,
                                 padding: "16px 20px",
                             } }
                         >
-                            <span style={ { fontWeight: 600 } }>{ row.name }</span>
-                            <span style={ { color: theme.mutedInk, fontSize: 15 } }>{ row.place }</span>
-                            <span style={ { fontSize: 15 } }>{ row.due }</span>
+                            <div>
+                                <div style={ { fontWeight: 600 } }>{ row.name }</div>
+                                <div style={ { color: theme.mutedInk, fontSize: 15 } }>{ row.place }</div>
+                                <div style={ { color: theme.mutedInk, fontSize: 15 } }>{ row.due }</div>
+                            </div>
                             <span
                                 style={ {
                                     fontSize: 18,
@@ -354,7 +353,7 @@ export function CallScene() {
                         litThrough={ lit }
                         gap={ 16 }
                         nodeWidth={ 156 }
-                        showHandoff={ false }
+                        showHandoff
                         tenant="John Smith"
                     />
                 </div>
@@ -392,7 +391,7 @@ export function CallScene() {
                                     alignSelf: turn.tenant ? "flex-end" : "flex-start",
                                     background: turn.tenant ? theme.surfaceSunken : theme.surface,
                                     border: turn.plan
-                                        ? `2px solid ${theme.ink}`
+                                        ? `2px solid ${theme.violet}`
                                         : `1px solid ${theme.border}`,
                                     borderRadius: theme.radiusMd,
                                     maxWidth: 760,
@@ -434,35 +433,34 @@ export function CallScene() {
                     />
                     <div
                         style={ {
-                            background: theme.ink,
-                            borderRadius: theme.radiusMd,
-                            marginTop: 18,
-                            padding: "14px 16px",
+                        background: theme.surface,
+                        border: `1px solid ${theme.border}`,
+                        borderRadius: theme.radiusMd,
+                        marginTop: 18,
+                        padding: "14px 16px",
+                    } }
+                >
+                    <div
+                        style={ {
+                            color: theme.mutedInk,
+                            fontFamily: fontSans,
+                            fontSize: 22,
+                            fontWeight: 600,
+                            textDecoration: "line-through",
                         } }
                     >
-                        <div
-                            style={ {
-                                color: theme.mint,
-                                fontFamily: fontSans,
-                                fontSize: 22,
-                                fontWeight: 600,
-                                opacity: 1,
-                                textDecoration: "line-through",
-                            } }
-                        >
-                            Asked: 4 payments
-                        </div>
-                        <div
-                            style={ {
-                                color: theme.mint,
-                                fontFamily: fontDisplay,
-                                fontSize: 32,
-                                marginTop: 8,
-                                opacity: 1,
-                            } }
-                        >
-                            Allowed: 2
-                        </div>
+                        Asked: 4 payments
+                    </div>
+                    <div
+                        style={ {
+                            color: theme.ink,
+                            fontFamily: fontDisplay,
+                            fontSize: 32,
+                            marginTop: 8,
+                        } }
+                    >
+                        Allowed: 2
+                    </div>
                     </div>
                     <div style={ { fontFamily: fontDisplay, fontSize: 28, marginTop: 16 } }>
                         $800.00 today
@@ -566,16 +564,17 @@ export function HardshipScene() {
                                     { flagged ? (
                                         <div
                                             style={ {
-                                                background: theme.mint,
+                                                background: theme.overdueBg,
                                                 borderRadius: theme.radiusPill,
-                                                color: theme.ink,
+                                                color: theme.overdueInk,
                                                 fontFamily: fontSans,
                                                 fontSize: 18,
                                                 fontWeight: 600,
                                                 padding: "6px 12px",
+                                                textTransform: "capitalize",
                                             } }
                                         >
-                                            Flagged
+                                            handoff
                                         </div>
                                     ) : null }
                                 </div>
@@ -919,17 +918,16 @@ export function TeaserOfferScene() {
                 >
                     <div
                         style={ {
-                            color: theme.mint,
+                            color: theme.overdueInk,
                             fontFamily: fontSans,
                             fontSize: 22,
                             fontWeight: 600,
-                            opacity: 1,
                             textDecoration: "line-through",
                         } }
                     >
                         Asked: 4 payments
                     </div>
-                    <div style={ { color: theme.mint, fontFamily: fontDisplay, fontSize: 42, marginTop: 8, opacity: 1 } }>
+                    <div style={ { color: theme.overdueInk, fontFamily: fontDisplay, fontSize: 42, marginTop: 8 } }>
                         Allowed: 2
                     </div>
                 </div>

@@ -1,40 +1,41 @@
 /**
  * @module remotion/theme
- * Mint Condition palette reduced to mint, ink, white, and one violet accent.
- * Depends on: uploads/design-system tokens.
+ * Light-mode tokens from src/styles/global.css. Brand mint, ink, and violet
+ * match the product. Status pairs follow the product even where they leave mint.
+ * Depends on: src/styles/global.css.
  * Used by: every Remotion scene.
  */
 
 export const theme = {
     mint: "#B8F2D0",
-    mintSoft: "#E3FAEC",
-    mintWash: "#F2FDF7",
-    mintDeep: "#86B49A",
+    mintSoft: "#E1F7EA",
+    mintWash: "#EFFBF4",
+    mintDeep: "#B5D9C4",
     ink: "#10241B",
-    inkSoft: "#294336",
+    inkSoft: "#3F5A4E",
     white: "#FFFFFF",
     violet: "#5B2BD9",
     brandMint: "#B8F2D0",
     onMint: "#10241B",
-    bg: "#F2FDF7",
+    bg: "#EFFBF4",
     surface: "#FFFFFF",
-    surfaceSunken: "#E3FAEC",
-    mutedInk: "#294336",
-    border: "#B8F2D0",
+    surfaceSunken: "#E1F7EA",
+    mutedInk: "#3F5A4E",
+    border: "#B5D9C4",
     borderStrong: "#10241B",
     inverse: "#10241B",
     onInverse: "#B8F2D0",
-    paidBg: "#B8F2D0",
-    paidInk: "#10241B",
-    overdueBg: "#10241B",
-    overdueInk: "#B8F2D0",
-    waitingBg: "#E3FAEC",
-    waitingInk: "#10241B",
-    activeBg: "#E3FAEC",
-    activeInk: "#10241B",
-    radiusSm: 6,
-    radiusMd: 10,
-    radiusLg: 16,
+    paidBg: "#C9F2D8",
+    paidInk: "#0A5C32",
+    overdueBg: "#FFE0D6",
+    overdueInk: "#8A2C0B",
+    waitingBg: "#FFEFC2",
+    waitingInk: "#6B4A00",
+    activeBg: "#E6DEFF",
+    activeInk: "#3E1BA6",
+    radiusSm: 10,
+    radiusMd: 12,
+    radiusLg: 14,
     radiusPill: 999,
 } as const;
 
@@ -49,10 +50,13 @@ export type TStatus =
 
 export function statusColors(status: TStatus): { bg: string; ink: string } {
     if (status === "Overdue" || status === "Payment failed") {
-        return { bg: theme.ink, ink: theme.mint };
+        return { bg: theme.overdueBg, ink: theme.overdueInk };
     }
-    if (status === "Paid" || status === "Plan active" || status === "Waiting on payment" || status === "Waiting on a person") {
-        return { bg: theme.mint, ink: theme.ink };
+    if (status === "Waiting on payment" || status === "Waiting on a person") {
+        return { bg: theme.waitingBg, ink: theme.waitingInk };
     }
-    return { bg: theme.mintSoft, ink: theme.ink };
+    if (status === "Paid" || status === "Plan active") {
+        return { bg: theme.paidBg, ink: theme.paidInk };
+    }
+    return { bg: theme.activeBg, ink: theme.activeInk };
 }
