@@ -51,6 +51,16 @@ ffmpeg -nostdin -y -hide_banner -loglevel error \
 echo "still RentRecoveryIntro held @ 8.500s"
 
 ffmpeg -nostdin -y -hide_banner -loglevel error \
+    -i "$OUT/RentRecoveryDemo.mp4" -ss 13.000 -frames:v 1 \
+    "$OUT/RentRecoveryDemo-portfolio-13s.png"
+echo "still RentRecoveryDemo portfolio @ 13.000s"
+
+ffmpeg -nostdin -y -hide_banner -loglevel error \
+    -i "$OUT/RentRecoveryDemo.mp4" -ss 16.000 -frames:v 1 \
+    "$OUT/RentRecoveryDemo-portfolio-16s.png"
+echo "still RentRecoveryDemo portfolio @ 16.000s"
+
+ffmpeg -nostdin -y -hide_banner -loglevel error \
     -i "$OUT/RentRecoveryDemo.mp4" -ss 26.000 -frames:v 1 \
     "$OUT/RentRecoveryDemo-chain.png"
 echo "still RentRecoveryDemo chain @ 26.000s"

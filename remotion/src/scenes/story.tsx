@@ -30,6 +30,10 @@ import { TENANTS } from "../roster";
 import { theme, type TStatus } from "../theme";
 
 const ROWS = TENANTS;
+const AMOUNT_COLUMN = 220;
+const STATUS_COLUMN = 300;
+const COLUMN_GAP = 40;
+const PORTFOLIO_COLUMNS = `minmax(0, 1fr) ${AMOUNT_COLUMN}px ${STATUS_COLUMN}px`;
 
 function countTo(frame: number, end: number): number {
     return Math.round(interpolate(frame, [8, 78], [0, end], {
@@ -76,7 +80,10 @@ export function PortfolioScene() {
         >
             <div
                 style={ {
+                    alignItems: "center",
+                    display: "flex",
                     inset: 0,
+                    justifyContent: "center",
                     opacity: 1 - cardsOut,
                     pointerEvents: "none",
                     position: "absolute",
@@ -88,22 +95,21 @@ export function PortfolioScene() {
                         background: theme.surface,
                         border: `1px solid ${theme.border}`,
                         borderRadius: theme.radiusLg,
-                        margin: "120px auto 0",
-                        padding: "28px 36px",
-                        width: 860,
+                        padding: "36px 47px",
+                        width: 1118,
                     } }
                 >
-                    <div style={ labelStyle }>APPFOLIO IMPORT</div>
+                    <div style={ { ...labelStyle, fontSize: 17 } }>APPFOLIO IMPORT</div>
                     <div
                         style={ {
                             fontFamily: fontDisplay,
-                            fontSize: 40,
-                            marginTop: 8,
+                            fontSize: 52,
+                            marginTop: 10,
                         } }
                     >
                         Synced to Supabase
                     </div>
-                    <div style={ { display: "flex", gap: 18, marginTop: 28 } }>
+                    <div style={ { display: "flex", gap: 23, marginTop: 36 } }>
                         { [
                             ["Properties", countTo(frame, 18)],
                             ["Units", countTo(frame, 64)],
@@ -115,14 +121,14 @@ export function PortfolioScene() {
                                     background: theme.surfaceSunken,
                                     borderRadius: theme.radiusLg,
                                     flex: 1,
-                                    padding: "18px 20px",
+                                    padding: "23px 26px",
                                 } }
                             >
-                                <div style={ labelStyle }>{ label }</div>
+                                <div style={ { ...labelStyle, fontSize: 17 } }>{ label }</div>
                                 <div
                                     style={ {
                                         fontFamily: fontDisplay,
-                                        fontSize: 56,
+                                        fontSize: 73,
                                         fontVariantNumeric: "tabular-nums",
                                         marginTop: 8,
                                     } }
@@ -139,6 +145,9 @@ export function PortfolioScene() {
                     background: theme.surface,
                     border: `1px solid ${theme.border}`,
                     borderRadius: theme.radiusLg,
+                    display: "flex",
+                    flex: 1,
+                    flexDirection: "column",
                     opacity: tableIn,
                     overflow: "hidden",
                     transform: `translateY(${(1 - tableIn) * 28}px)`,
@@ -146,16 +155,18 @@ export function PortfolioScene() {
             >
                 <div
                     style={ {
-                        background: theme.surfaceSunken,
-                        display: "grid",
-                        gridTemplateColumns: "1fr auto auto",
-                        padding: "12px 20px",
                         ...labelStyle,
+                        background: theme.surfaceSunken,
+                        columnGap: COLUMN_GAP,
+                        display: "grid",
+                        fontSize: 17,
+                        gridTemplateColumns: PORTFOLIO_COLUMNS,
+                        padding: "16px 26px",
                     } }
                 >
                     <span>Tenancy</span>
                     <span style={ { textAlign: "right" } }>Amount</span>
-                    <span>Status</span>
+                    <span style={ { textAlign: "right" } }>Status</span>
                 </div>
                 { ROWS.map((row, index) => {
                     const rowIn = spring({
@@ -169,20 +180,22 @@ export function PortfolioScene() {
                             style={ {
                                 alignItems: "center",
                                 borderTop: `1px solid ${theme.border}`,
+                                columnGap: COLUMN_GAP,
                                 display: "grid",
-                                gridTemplateColumns: "1fr auto auto",
+                                flex: 1,
+                                gridTemplateColumns: PORTFOLIO_COLUMNS,
                                 opacity: rowIn,
-                                padding: "16px 20px",
+                                padding: "0 26px",
                             } }
                         >
                             <div>
-                                <div style={ { fontWeight: 600 } }>{ row.name }</div>
-                                <div style={ { color: theme.mutedInk, fontSize: 15 } }>{ row.place }</div>
-                                <div style={ { color: theme.mutedInk, fontSize: 15 } }>{ row.due }</div>
+                                <div style={ { fontSize: 21, fontWeight: 600 } }>{ row.name }</div>
+                                <div style={ { color: theme.mutedInk, fontSize: 20 } }>{ row.place }</div>
+                                <div style={ { color: theme.mutedInk, fontSize: 20 } }>{ row.due }</div>
                             </div>
                             <span
                                 style={ {
-                                    fontSize: 18,
+                                    fontSize: 23,
                                     fontVariantNumeric: "tabular-nums",
                                     fontWeight: 600,
                                     textAlign: "right",
@@ -190,7 +203,7 @@ export function PortfolioScene() {
                             >
                                 { row.amount }
                             </span>
-                            <span style={ { textAlign: "right" } }>
+                            <span style={ { display: "flex", justifyContent: "flex-end" } }>
                                 <StatusBadge status={ row.status } />
                             </span>
                         </div>
@@ -269,7 +282,7 @@ export function WebhookScene() {
                     bottom: 148,
                     opacity: ring,
                     position: "absolute",
-                    right: 72,
+                    right: 112,
                     transform: `translateY(${(1 - ring) * 20}px)`,
                 } }
             >

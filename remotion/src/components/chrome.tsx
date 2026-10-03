@@ -204,19 +204,19 @@ export function AppShell({
                     bottom: 0,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 8,
+                    gap: 10,
                     left: 0,
-                    padding: "28px 22px",
+                    padding: "36px 29px",
                     position: "absolute",
                     top: 0,
-                    width: 300,
+                    width: 390,
                 } }
             >
-                <div style={ { marginBottom: 28, paddingLeft: 8 } }>
+                <div style={ { marginBottom: 36, paddingLeft: 10 } }>
                     <Logo
-                        markHeight={ 44 }
+                        markHeight={ 57 }
                         tone="mint"
-                        wordmarkSize={ 24 }
+                        wordmarkSize={ 31 }
                     />
                 </div>
                 { NAV.map((item) => (
@@ -226,24 +226,24 @@ export function AppShell({
                             borderRadius: theme.radiusMd,
                             color: theme.ink,
                             fontFamily: fontSans,
-                            fontSize: 18,
+                            fontSize: 23,
                             fontWeight: 600,
-                            padding: "12px 16px",
+                            padding: "16px 21px",
                         } }
                     >
                         { item }
                     </div>
                 )) }
-                <div style={ { ...labelStyle, marginTop: 18, paddingLeft: 16 } }>Navigate</div>
-                <div style={ { ...labelStyle, marginTop: 18, paddingLeft: 16 } }>Recents</div>
+                <div style={ { ...labelStyle, fontSize: 17, marginTop: 23, paddingLeft: 21 } }>Navigate</div>
+                <div style={ { ...labelStyle, fontSize: 17, marginTop: 23, paddingLeft: 21 } }>Recents</div>
             </aside>
             <main
                 style={ {
                     bottom: 150,
                     display: "flex",
                     flexDirection: "column",
-                    left: 300,
-                    padding: "36px 40px 20px",
+                    left: 390,
+                    padding: "47px 52px 26px",
                     position: "absolute",
                     right: 0,
                     top: 0,
@@ -254,13 +254,13 @@ export function AppShell({
                         alignItems: "center",
                         display: "flex",
                         justifyContent: "space-between",
-                        marginBottom: 24,
+                        marginBottom: 31,
                     } }
                 >
                     <h1
                         style={ {
                             fontFamily: fontDisplay,
-                            fontSize: 40,
+                            fontSize: 52,
                             fontWeight: 400,
                             letterSpacing: -0.5,
                             lineHeight: 1.08,
