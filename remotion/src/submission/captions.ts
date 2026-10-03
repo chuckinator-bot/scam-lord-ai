@@ -172,7 +172,8 @@ export function localFrameAtPhrase(sectionId: TSectionId, phrase: string): numbe
 }
 
 export function guideSrt(): string {
-    return GUIDE_CUES.map((cue, index) => {
+    const ordered = [...GUIDE_CUES].sort((a, b) => a.startFrame - b.startFrame);
+    return ordered.map((cue, index) => {
         const start = framesToTimestamp(cue.startFrame);
         const end = framesToTimestamp(cue.endFrame);
         return `${index + 1}\n${start} --> ${end}\n${cue.text}\n`;

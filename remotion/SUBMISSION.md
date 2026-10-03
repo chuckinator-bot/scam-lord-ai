@@ -68,7 +68,7 @@ From `remotion/`:
 
 ```bash
 node scripts/detect-submission-assets.mjs
-node --experimental-strip-types scripts/write-submission-srt.ts
+npx vite-node scripts/write-submission-srt.ts
 npx remotion render src/index.ts RentRecoverySubmission --codec=h264 --audio-codec=aac --crf=18 --image-format=jpeg --jpeg-quality=90 --pixel-format=yuv420p --concurrency=2
 npx remotion render src/index.ts RentRecoverySubmissionGuide --codec=h264 --audio-codec=aac --crf=18 --image-format=jpeg --jpeg-quality=90 --pixel-format=yuv420p --concurrency=2
 ```

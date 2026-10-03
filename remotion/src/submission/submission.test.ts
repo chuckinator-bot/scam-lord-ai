@@ -137,6 +137,8 @@ describe("narration", () => {
         expect(srt).toContain("[live call] Mia: Hi, is this John? It's Mia from Sunset Properties.");
         expect(srt).not.toContain("777");
         expect(srt).not.toContain("65 billion");
+        const stamps = [...srt.matchAll(/(\d{2}:\d{2}:\d{2},\d{3}) -->/g)].map((match) => match[1]);
+        expect(stamps).toEqual([...stamps].sort());
     });
 });
 

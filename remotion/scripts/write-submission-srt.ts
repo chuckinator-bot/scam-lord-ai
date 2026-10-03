@@ -1,7 +1,7 @@
 /**
  * @module remotion/scripts/write-submission-srt
  * Writes the narration guide SRT from the caption module.
- * Run from remotion/: node --experimental-strip-types scripts/write-submission-srt.ts
+ * Run from remotion/: npx vite-node scripts/write-submission-srt.ts
  */
 
 import { mkdirSync, writeFileSync } from "node:fs";
