@@ -1,0 +1,25 @@
+1
+00:00:00,000 --> 00:00:02,000
+RENT IS LATE.
+John Smith
+$2,400 overdue
+
+2
+00:00:02,000 --> 00:00:04,000
+Someone has to chase it.
+Not anymore.
+
+3
+00:00:04,000 --> 00:00:07,000
+Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties...
+
+4
+00:00:07,000 --> 00:00:09,000
+$2,400 OVERDUE
+$800 PAID
+$1,600 SCHEDULED
+
+5
+00:00:09,000 --> 00:00:11,000
+RentRecovery
+From overdue to paid.
