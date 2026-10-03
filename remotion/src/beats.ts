@@ -59,14 +59,11 @@ const LOCKUP_CAPTION = "Built at the Supabase hackathon.";
 const TEASER_OFFER_CAPTION = "$800.00 today, $1,600.00 on the 14th. Lawn mowed Saturday.";
 const BENEFIT_CAPTION = "Past due drops. Owners get paid.";
 const DEMO30_PORTFOLIO_CAPTION = "Syncs from AppFolio into Supabase. Each landlord sees only their rows.";
-
-/** Casey replaces John late enough that her 0.82 gauge has settled when the second caption starts. */
-export const DEMO30_CASEY_ENTER_FRAME = 48;
-export const DEMO30_CASEY_SCORE_FRAMES = 12;
-export const DEMO30_CASEY_CAPTION_FRAME = DEMO30_CASEY_ENTER_FRAME + DEMO30_CASEY_SCORE_FRAMES;
-/** Local frame of "Send the link." The negotiation beat holds it for 2s. */
-export const DEMO30_LINK_FRAME = 72;
+/** Spoken opener for the 30-second film. The 11s intro keeps VOICE_LINE_V7. */
+export const VOICE_LINE_MIA = "Hi, is this John? It's Mia from Sunset Properties.";
+/** Hardship line on the 30-second film. Only this score clears 0.75. */
 export const DEMO30_FLAG_LINE = 0.75;
+export const DEMO30_HARDSHIP_SCORE = 0.81;
 
 function introBeats(voice: string, durations: readonly [number, number, number, number, number]): readonly IBeat[] {
     const [late, chase, wake, split, brand] = durations;
@@ -121,9 +118,8 @@ const introBeatsV7 = introBeats(VOICE_LINE_V7, [60, 60, 90, 60, 60]);
 /** v6 open. Demo and teaser still start on this clock. */
 const introBeatsV6 = introBeats(VOICE_LINE, [60, 60, 90, 60, 60]);
 /**
- * Three Demo30 cards inside 7.2s. The spoken line is about 3.96s, so the wake
- * card starts at 2.0s and the line finishes over the start of the third card.
- * The fade and chime still end before the portfolio at 7.2s.
+ * Three Demo30 cards inside 7.2s. Mia's opener starts with the wake card and
+ * finishes over the start of the third card, before the portfolio at 7.2s.
  */
 const introBeats30: readonly IBeat[] = [
     {
@@ -138,14 +134,14 @@ const introBeats30: readonly IBeat[] = [
         from: 60,
         durationInFrames: 72,
         caption: null,
-        srt: VOICE_LINE_V7,
+        srt: VOICE_LINE_MIA,
     },
     {
         id: "close",
         from: 132,
         durationInFrames: 84,
         caption: null,
-        srt: "$2,400 OVERDUE\n$800 PAID\n$1,600 SCHEDULED\nRentRecovery\nFrom overdue to paid.",
+        srt: "$2,400 OVERDUE\n$1,200 PAID\n$1,200 BY THE 18TH\nRentRecovery\nFrom overdue to paid.",
     },
 ];
 
@@ -237,35 +233,41 @@ const demo30Story = place(
     [
         {
             id: "portfolio",
-            durationInFrames: 120,
+            durationInFrames: 108,
             caption: DEMO30_PORTFOLIO_CAPTION,
             srt: DEMO30_PORTFOLIO_CAPTION,
         },
         {
             id: "chain",
-            durationInFrames: 150,
+            durationInFrames: 108,
             caption: WEBHOOK_CAPTION,
             srt: WEBHOOK_CAPTION,
         },
         {
             id: "call",
-            durationInFrames: 132,
-            caption: CALL_CAPTION,
-            srt: CALL_CAPTION,
+            durationInFrames: 126,
+            caption: "Your tap repair is booked for Thursday.",
+            cues: [
+                { from: 0, text: "Your tap repair is booked for Thursday." },
+                { from: 63, text: "October's $2,400 is unpaid. His hours got cut." },
+            ],
+            srt: "Your tap repair is booked for Thursday.",
         },
         {
-            id: "hardship",
-            durationInFrames: 120,
-            caption: HARDSHIP_JOHN_CAPTION,
-            cues: [
-                { from: 0, text: HARDSHIP_JOHN_CAPTION },
-                { from: DEMO30_CASEY_CAPTION_FRAME, text: HARDSHIP_CASEY_CAPTION },
-            ],
-            srt: HARDSHIP_JOHN_CAPTION,
+            id: "assist",
+            durationInFrames: 90,
+            caption: "John hits 0.81. The city rent link is texted.",
+            srt: "John hits 0.81. The city rent link is texted.",
+        },
+        {
+            id: "offer",
+            durationInFrames: 108,
+            caption: "$1,200 today and the rest by the 18th.",
+            srt: "$1,200 today and the rest by the 18th.",
         },
         {
             id: "benefit",
-            durationInFrames: 102,
+            durationInFrames: 84,
             caption: BENEFIT_CAPTION,
             srt: BENEFIT_CAPTION,
         },

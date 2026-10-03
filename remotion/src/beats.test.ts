@@ -13,10 +13,7 @@ import {
     CASEY_SCORE_FRAMES,
     DEMO,
     DEMO30,
-    DEMO30_CASEY_CAPTION_FRAME,
-    DEMO30_CASEY_ENTER_FRAME,
-    DEMO30_CASEY_SCORE_FRAMES,
-    DEMO30_LINK_FRAME,
+    VOICE_LINE_MIA,
     FILMS,
     filmToSrt,
     FPS,
@@ -63,7 +60,8 @@ describe("film durations", () => {
             "portfolio",
             "chain",
             "call",
-            "hardship",
+            "assist",
+            "offer",
             "benefit",
             "lockup",
         ]);
@@ -71,8 +69,14 @@ describe("film durations", () => {
         expect(beatById(DEMO30, "wake").durationInFrames).toBe(72);
         expect(beatById(DEMO30, "close").durationInFrames).toBe(84);
         expect(beatById(DEMO30, "portfolio").from).toBe(216);
+        expect(beatById(DEMO30, "portfolio").durationInFrames).toBe(108);
+        expect(beatById(DEMO30, "chain").from).toBe(324);
+        expect(beatById(DEMO30, "call").from).toBe(432);
+        expect(beatById(DEMO30, "assist").from).toBe(558);
+        expect(beatById(DEMO30, "offer").from).toBe(648);
+        expect(beatById(DEMO30, "benefit").from).toBe(756);
+        expect(beatById(DEMO30, "lockup").from).toBe(840);
         assertOrder(DEMO30.beats);
-        expect(beatById(DEMO30, "call").durationInFrames - DEMO30_LINK_FRAME).toBeGreaterThanOrEqual(2 * FPS);
         expect(DEMO30.beats.some((beat) => beat.id === "pay")).toBe(false);
     });
 
@@ -168,13 +172,15 @@ describe("captions", () => {
         expect(beatById(DEMO30, "benefit").caption).toBe("Past due drops. Owners get paid.");
         expect(beatById(DEMO30, "benefit").caption?.split(/\s+/).length).toBeLessThanOrEqual(8);
         expect(beatById(DEMO30, "lockup").caption).toBe("Built at the Supabase hackathon.");
-        expect(beatById(DEMO30, "hardship").cues).toEqual([
-            { from: 0, text: "Every turn gets a hardship check." },
-            {
-                from: DEMO30_CASEY_CAPTION_FRAME,
-                text: "Casey hits 0.82. A person takes it from here.",
-            },
+        expect(beatById(DEMO30, "call").cues).toEqual([
+            { from: 0, text: "Your tap repair is booked for Thursday." },
+            { from: 63, text: "October's $2,400 is unpaid. His hours got cut." },
         ]);
+        expect(beatById(DEMO30, "assist").caption).toBe("John hits 0.81. The city rent link is texted.");
+        expect(beatById(DEMO30, "offer").caption).toBe("$1,200 today and the rest by the 18th.");
+        expect(beatById(DEMO30, "wake").srt).toBe(VOICE_LINE_MIA);
+        expect(beatById(DEMO30, "close").srt).toContain("$1,200 BY THE 18TH");
+        expect(beatById(DEMO30, "close").srt).not.toContain("$800");
     });
 
     it("keeps every caption on screen for at least two seconds", () => {
@@ -213,9 +219,7 @@ describe("captions", () => {
         expect(johnStill).toBeLessThan(hardship.from + HARDSHIP_CASEY_CAPTION_FRAME);
         expect(caseyStill).toBeGreaterThanOrEqual(hardship.from + HARDSHIP_CASEY_CAPTION_FRAME);
         expect(caseyStill).toBeLessThan(hardship.from + hardship.durationInFrames);
-        expect(DEMO30_CASEY_CAPTION_FRAME).toBe(DEMO30_CASEY_ENTER_FRAME + DEMO30_CASEY_SCORE_FRAMES);
-        const short = beatById(DEMO30, "hardship");
-        expect(short.cues?.[1]?.from).toBe(DEMO30_CASEY_CAPTION_FRAME);
+        expect(beatById(DEMO30, "assist").caption).not.toContain("Casey");
     });
 
     it("leaves the intro free of lower-third captions", () => {
@@ -237,10 +241,14 @@ describe("captions", () => {
         const teaser = filmToSrt(TEASER);
         expect(teaser).toContain(VOICE_LINE);
         const demo30 = filmToSrt(DEMO30);
-        expect(demo30).toContain(VOICE_LINE_V7);
+        expect(demo30).toContain(VOICE_LINE_MIA);
+        expect(demo30).not.toContain(VOICE_LINE_V7);
         expect(demo30).not.toContain("invoice.overdue");
         expect(demo30).not.toContain("an AI assistant");
         expect(demo30).not.toContain("Link lands by text and email");
+        expect(demo30).not.toContain("$800");
+        expect(demo30).not.toContain("$1,600");
+        expect(demo30).not.toContain("Casey");
         expect(demo30.endsWith("Built at the Supabase hackathon.\n") || demo30.includes("Built at the Supabase hackathon.")).toBe(true);
         expect(demo).toContain("00:00:36,000 --> 00:00:41,600\nEvery turn gets a hardship check.");
         expect(demo).toContain("00:00:41,600 --> 00:00:46,000\nCasey hits 0.82. A person takes it from here.");

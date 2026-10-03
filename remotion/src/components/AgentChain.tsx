@@ -30,6 +30,7 @@ export function AgentChain({
     nodeWidth = 168,
     gap = 28,
     badge,
+    floor = false,
 }: {
     tenant: string;
     litThrough: number;
@@ -38,6 +39,8 @@ export function AgentChain({
     nodeWidth?: number;
     gap?: number;
     badge?: TStatus;
+    /** StepNode chrome: current step uses the ring, other steps stay on the card border. */
+    floor?: boolean;
 }) {
     const nodeHeight = Math.max(72, Math.round(nodeWidth * 0.46));
     const layout = layoutChain(nodeWidth, gap).filter((node) => showHandoff || node.step !== "handoff");
@@ -139,7 +142,7 @@ export function AgentChain({
                             background: theme.white,
                             border: current
                                 ? `2px solid ${theme.violet}`
-                                : `1px solid ${lit ? theme.ink : theme.border}`,
+                                : `1px solid ${floor || !lit ? theme.border : theme.ink}`,
                             borderRadius: theme.radiusMd,
                             boxShadow: "0 1px 2px rgba(16, 36, 27, 0.08)",
                             height: nodeHeight,
