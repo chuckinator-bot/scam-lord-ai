@@ -25,7 +25,7 @@ import {
 import { Gauge, Phone, Waveform } from "../components/devices";
 import { fontDisplay, fontSans } from "../fonts";
 import { HERO_GAP, HERO_NODE_WIDTH } from "../floor-layout";
-import { CASEY_QUESTIONS, isFlagged } from "../jev";
+import { CASEY_QUESTIONS, FLAG_LINE } from "../jev";
 import { TENANTS } from "../roster";
 import { theme, type TStatus } from "../theme";
 
@@ -305,13 +305,15 @@ export function WebhookScene() {
     );
 }
 
-const TURNS: ReadonlyArray<{
-    at: number;
-    plan: boolean;
-    speaker: string;
-    text: string;
-    tenant: boolean;
-}> = [
+export interface ICallTurn {
+    readonly at: number;
+    readonly plan: boolean;
+    readonly speaker: string;
+    readonly tenant: boolean;
+    readonly text: string;
+}
+
+const TURNS: readonly ICallTurn[] = [
     {
         at: 8,
         plan: false,
@@ -342,15 +344,24 @@ const TURNS: ReadonlyArray<{
     },
 ];
 
-export function CallScene() {
+export function CallScene({
+    policyFrame = 176,
+    turns = TURNS,
+}: {
+    policyFrame?: number;
+    turns?: readonly ICallTurn[];
+} = {}) {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
-    const lit = frame < 110 ? 3 : frame < 190 ? 4.2 : frame < CALL_LINK_FRAME ? 5.15 : 6.3;
-    const active = frame < 110 ? "disclosure" : frame < 190 ? "jev" : frame < CALL_LINK_FRAME ? "policy" : "plan";
+    const askAt = turns[1]?.at ?? 110;
+    const offerAt = turns[2]?.at ?? 190;
+    const linkAt = turns[3]?.at ?? CALL_LINK_FRAME;
+    const lit = frame < askAt ? 3 : frame < offerAt ? 4.2 : frame < linkAt ? 5.15 : 6.3;
+    const active = frame < askAt ? "disclosure" : frame < offerAt ? "jev" : frame < linkAt ? "policy" : "plan";
     const policyIn = spring({
         config: { damping: 14, stiffness: 140 },
         fps,
-        frame: frame - 176,
+        frame: frame - policyFrame,
     });
 
     return (
@@ -388,7 +399,7 @@ export function CallScene() {
                         color={ theme.ink }
                         height={ 48 }
                     />
-                    { TURNS.map((turn) => {
+                    { turns.map((turn) => {
                         const shown = spring({
                             config: { damping: 14, stiffness: 150 },
                             fps,
@@ -507,12 +518,21 @@ function PolicyRow({ label, value }: { label: string; value: string }) {
     );
 }
 
-export function HardshipScene() {
+export function HardshipScene({
+    enterFrame = CASEY_ENTER_FRAME,
+    flagLine = FLAG_LINE,
+    scoreFrames = CASEY_SCORE_FRAMES,
+}: {
+    enterFrame?: number;
+    flagLine?: number;
+    scoreFrames?: number;
+} = {}) {
     const frame = useCurrentFrame();
-    const casey = frame >= CASEY_ENTER_FRAME;
-    const local = casey ? frame - CASEY_ENTER_FRAME : frame;
+    const casey = frame >= enterFrame;
+    const local = casey ? frame - enterFrame : frame;
+    const flagged = (score: number) => score >= flagLine;
     const hardship = casey
-        ? interpolate(local, [0, CASEY_SCORE_FRAMES], [0.2, 0.82], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+        ? interpolate(local, [0, scoreFrames], [0.2, 0.82], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
         : interpolate(local, [0, 24], [0, 0.12], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
     const questions = casey
         ? CASEY_QUESTIONS.map((question) => question.name === "Hardship" ? { ...question, score: hardship } : question)
@@ -523,7 +543,7 @@ export function HardshipScene() {
         ];
     const name = casey ? "Casey Diaz" : "John Smith";
     const place = casey ? "9 Alder · $960.00" : "Sunset Properties · $2,400.00";
-    const status: TStatus = casey && isFlagged(hardship) ? "Waiting on a person" : "In progress";
+    const status: TStatus = casey && flagged(hardship) ? "Waiting on a person" : "In progress";
 
     return (
         <AbsoluteFill
@@ -550,13 +570,13 @@ export function HardshipScene() {
                 </div>
                 <div style={ { display: "flex", gap: 24, marginTop: 32 } }>
                     { questions.map((question) => {
-                        const flagged = isFlagged(question.score);
+                        const hot = flagged(question.score);
                         return (
                             <div
                                 key={ question.name }
                                 style={ {
                                     background: theme.white,
-                                    border: `2px solid ${flagged ? theme.ink : theme.mintDeep}`,
+                                    border: `2px solid ${hot ? theme.ink : theme.mintDeep}`,
                                     borderRadius: theme.radiusLg,
                                     flex: 1,
                                     padding: "22px 22px 18px",
@@ -574,7 +594,7 @@ export function HardshipScene() {
                                     >
                                         { question.score.toFixed(2) }
                                     </div>
-                                    { flagged ? (
+                                    { hot ? (
                                         <div
                                             style={ {
                                                 background: theme.overdueBg,
@@ -593,6 +613,7 @@ export function HardshipScene() {
                                 </div>
                                 <div style={ { marginTop: 16 } }>
                                     <Gauge
+                                        flagLine={ flagLine }
                                         score={ question.score }
                                         width={ 480 }
                                     />
@@ -618,7 +639,7 @@ export function HardshipScene() {
                                 A person from Sunset Properties will follow up with you.
                             </div>
                         </div>
-                        { isFlagged(hardship) ? (
+                        { flagged(hardship) ? (
                             <div
                                 style={ {
                                     background: theme.mintSoft,
@@ -788,7 +809,7 @@ export function PayScene() {
 
 const STACK = ["Supabase", "Claude", "LiveKit", "ElevenLabs", "Stripe", "Twilio"] as const;
 
-export function LockupScene() {
+export function LockupScene({ showStack = true }: { showStack?: boolean } = {}) {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
     const enter = spring({ config: { damping: 14, stiffness: 120 }, fps, frame });
@@ -827,6 +848,7 @@ export function LockupScene() {
                 >
                     From overdue to paid.
                 </div>
+                { showStack ? (
                 <div style={ { display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center", marginTop: 48, maxWidth: 1100 } }>
                     { STACK.map((name, index) => {
                         const chip = spring({
@@ -854,6 +876,7 @@ export function LockupScene() {
                         );
                     }) }
                 </div>
+                ) : null }
             </div>
         </AbsoluteFill>
     );

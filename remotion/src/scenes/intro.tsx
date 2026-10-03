@@ -214,7 +214,13 @@ export function ChaseBeat() {
     );
 }
 
-export function WakeBeat() {
+export function WakeBeat({
+    line = "Hi John, this is RentRecovery, an AI assistant.",
+    showBadge = true,
+}: {
+    line?: string;
+    showBadge?: boolean;
+} = {}) {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
     const logo = spring({
@@ -227,7 +233,7 @@ export function WakeBeat() {
         fps,
         frame: frame - 16,
     });
-    const line = interpolate(frame, [18, 32], [0, 1], {
+    const spoken = interpolate(frame, [18, 32], [0, 1], {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
     });
@@ -257,27 +263,29 @@ export function WakeBeat() {
                     transform: `translateX(${(1 - event) * -36}px)`,
                 } }
             >
-                <div
-                    style={ {
-                        background: theme.mint,
-                        borderRadius: theme.radiusPill,
-                        color: theme.ink,
-                        display: "inline-block",
-                        fontFamily: fontSans,
-                        fontSize: 22,
-                        fontWeight: 600,
-                        padding: "8px 16px",
-                    } }
-                >
-                    invoice.overdue
-                </div>
+                { showBadge ? (
+                    <div
+                        style={ {
+                            background: theme.mint,
+                            borderRadius: theme.radiusPill,
+                            color: theme.ink,
+                            display: "inline-block",
+                            fontFamily: fontSans,
+                            fontSize: 22,
+                            fontWeight: 600,
+                            padding: "8px 16px",
+                        } }
+                    >
+                        invoice.overdue
+                    </div>
+                ) : null }
                 <div
                     style={ {
                         fontFamily: fontDisplay,
                         fontSize: 72,
                         letterSpacing: -1.5,
                         lineHeight: 1,
-                        marginTop: 28,
+                        marginTop: showBadge ? 28 : 0,
                     } }
                 >
                     RentRecovery wakes up
@@ -288,7 +296,7 @@ export function WakeBeat() {
                     alignItems: "center",
                     display: "flex",
                     gap: 28,
-                    opacity: line,
+                    opacity: spoken,
                     position: "absolute",
                     right: 120,
                     top: 470,
@@ -314,7 +322,7 @@ export function WakeBeat() {
                         maxWidth: 640,
                     } }
                 >
-                    Hi John, this is RentRecovery, an AI assistant.
+                    { line }
                 </div>
             </div>
         </AbsoluteFill>

@@ -1,0 +1,53 @@
+1
+00:00:00,000 --> 00:00:01,200
+RENT IS LATE.
+John Smith
+$2,400 overdue
+
+2
+00:00:01,200 --> 00:00:02,400
+Someone has to chase it.
+Not anymore.
+
+3
+00:00:02,400 --> 00:00:04,800
+Hi John, this is RentRecovery, calling for Sunset Properties.
+
+4
+00:00:04,800 --> 00:00:06,000
+$2,400 OVERDUE
+$800 PAID
+$1,600 SCHEDULED
+
+5
+00:00:06,000 --> 00:00:07,200
+RentRecovery
+From overdue to paid.
+
+6
+00:00:07,200 --> 00:00:11,200
+Portfolio syncs to Supabase. Row-level security keeps each landlord in their own rows.
+
+7
+00:00:11,200 --> 00:00:16,200
+The overdue invoice starts the call on its own.
+
+8
+00:00:16,200 --> 00:00:20,600
+Tenant asks for 4 payments. Policy caps it at 2, and Claude counters inside that limit.
+
+9
+00:00:20,600 --> 00:00:22,600
+Every turn gets a hardship check.
+
+10
+00:00:22,600 --> 00:00:24,600
+Casey hits 0.82. A person takes it from here.
+
+11
+00:00:24,600 --> 00:00:28,000
+John's $800.00 is collected and $1,600.00 is scheduled. $6,760.00 of the $7,560.00 book is still open.
+
+12
+00:00:28,000 --> 00:00:30,000
+Built at the Supabase hackathon.

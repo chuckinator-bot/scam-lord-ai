@@ -19,6 +19,10 @@ export const CASEY_QUESTIONS: readonly IJevQuestion[] = [
     { name: "Distressed", score: 0.4 },
 ];
 
+export function isFlaggedAt(score: number, line: number): boolean {
+    return score >= line;
+}
+
 export function isFlagged(score: number): boolean {
-    return score >= FLAG_LINE;
+    return isFlaggedAt(score, FLAG_LINE);
 }

@@ -1,16 +1,31 @@
 /**
  * @module remotion/Films
- * RentRecoveryIntro, RentRecoveryDemo, and RentRecoveryTeaser.
+ * RentRecoveryIntro, RentRecoveryDemo, RentRecoveryTeaser, and RentRecoveryDemo30.
  * Depends on: beats, scenes, chrome.
  * Used by: Root.
  */
 
 import type { ReactNode } from "react";
 import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { beatById, DEMO, INTRO, TEASER, type IBeat, type IFilm } from "./beats";
+import {
+    beatById,
+    DEMO,
+    DEMO30,
+    DEMO30_CASEY_ENTER_FRAME,
+    DEMO30_CASEY_SCORE_FRAMES,
+    DEMO30_FLAG_LINE,
+    INTRO,
+    TEASER,
+    VOICE_LINE,
+    VOICE_LINE_V7,
+    type IBeat,
+    type IFilm,
+} from "./beats";
 import { fontSans } from "./fonts";
 import { Caption, Snap } from "./components/chrome";
+import { DEMO30_POLICY_FRAME, DEMO30_TURNS } from "./demo30-story";
 import { BrandBeat, ChaseBeat, LateBeat, SplitBeat, WakeBeat } from "./scenes/intro";
+import { Demo30Benefit, Demo30Chain, Demo30Portfolio } from "./scenes/demo30";
 import {
     CallScene,
     HardshipScene,
@@ -89,36 +104,45 @@ function CuedCaption({
     );
 }
 
-function IntroBeats() {
+function IntroBeats({
+    edition,
+    film,
+}: {
+    edition: "v6" | "v7";
+    film: IFilm;
+}) {
     return (
         <>
             <Beat
-                film={ INTRO }
+                film={ film }
                 id="late"
             >
                 <LateBeat />
             </Beat>
             <Beat
-                film={ INTRO }
+                film={ film }
                 id="chase"
             >
                 <ChaseBeat />
             </Beat>
             <Beat
-                film={ INTRO }
+                film={ film }
                 id="wake"
                 snap={ 0.03 }
             >
-                <WakeBeat />
+                <WakeBeat
+                    line={ edition === "v7" ? VOICE_LINE_V7 : VOICE_LINE }
+                    showBadge={ edition === "v6" }
+                />
             </Beat>
             <Beat
-                film={ INTRO }
+                film={ film }
                 id="split"
             >
                 <SplitBeat />
             </Beat>
             <Beat
-                film={ INTRO }
+                film={ film }
                 id="brand"
                 snap={ 0.02 }
             >
@@ -132,8 +156,11 @@ export function IntroFilm() {
     return (
         <AbsoluteFill style={ { fontFamily: fontSans } }>
             <style>{ `* { font-family: ${fontSans}, sans-serif; }` }</style>
-            <Audio src={ staticFile("audio/intro.wav") } />
-            <IntroBeats />
+            <Audio src={ staticFile("audio/intro-v7.wav") } />
+            <IntroBeats
+                edition="v7"
+                film={ INTRO }
+            />
         </AbsoluteFill>
     );
 }
@@ -143,7 +170,10 @@ export function DemoFilm() {
         <AbsoluteFill style={ { fontFamily: fontSans } }>
             <style>{ `* { font-family: ${fontSans}, sans-serif; }` }</style>
             <Audio src={ staticFile("audio/demo.wav") } />
-            <IntroBeats />
+            <IntroBeats
+                edition="v6"
+                film={ DEMO }
+            />
             <Beat
                 film={ DEMO }
                 id="portfolio"
@@ -191,7 +221,10 @@ export function TeaserFilm() {
         <AbsoluteFill style={ { fontFamily: fontSans } }>
             <style>{ `* { font-family: ${fontSans}, sans-serif; }` }</style>
             <Audio src={ staticFile("audio/teaser.wav") } />
-            <IntroBeats />
+            <IntroBeats
+                edition="v6"
+                film={ TEASER }
+            />
             <Beat
                 film={ TEASER }
                 id="chain"
@@ -211,6 +244,64 @@ export function TeaserFilm() {
                 snap={ 0.02 }
             >
                 <LockupScene />
+            </Beat>
+        </AbsoluteFill>
+    );
+}
+
+export function Demo30Film() {
+    return (
+        <AbsoluteFill style={ { fontFamily: fontSans } }>
+            <style>{ `* { font-family: ${fontSans}, sans-serif; }` }</style>
+            <Audio src={ staticFile("audio/demo30.wav") } />
+            <IntroBeats
+                edition="v7"
+                film={ DEMO30 }
+            />
+            <Beat
+                film={ DEMO30 }
+                id="portfolio"
+            >
+                <Demo30Portfolio />
+            </Beat>
+            <Beat
+                film={ DEMO30 }
+                id="chain"
+                snap={ 0.015 }
+            >
+                <Demo30Chain />
+            </Beat>
+            <Beat
+                film={ DEMO30 }
+                id="call"
+            >
+                <CallScene
+                    policyFrame={ DEMO30_POLICY_FRAME }
+                    turns={ DEMO30_TURNS }
+                />
+            </Beat>
+            <Beat
+                film={ DEMO30 }
+                id="hardship"
+            >
+                <HardshipScene
+                    enterFrame={ DEMO30_CASEY_ENTER_FRAME }
+                    flagLine={ DEMO30_FLAG_LINE }
+                    scoreFrames={ DEMO30_CASEY_SCORE_FRAMES }
+                />
+            </Beat>
+            <Beat
+                film={ DEMO30 }
+                id="benefit"
+            >
+                <Demo30Benefit />
+            </Beat>
+            <Beat
+                film={ DEMO30 }
+                id="lockup"
+                snap={ 0.02 }
+            >
+                <LockupScene showStack={ false } />
             </Beat>
         </AbsoluteFill>
     );

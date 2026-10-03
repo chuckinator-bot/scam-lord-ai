@@ -1,6 +1,6 @@
 /**
  * @module remotion/beats
- * Frame timing for the three RentRecovery films. 30 fps, 1920x1080.
+ * Frame timing for the RentRecovery films. 30 fps, 1920x1080.
  * Depends on: none.
  * Used by: compositions, captions, tests.
  */
@@ -50,48 +50,80 @@ const WEBHOOK_CAPTION = "The overdue invoice starts the call on its own.";
 const CALL_CAPTION = "Tenant asks for 4 payments. Policy caps it at 2, and Claude counters inside that limit.";
 const HARDSHIP_JOHN_CAPTION = "Every turn gets a hardship check.";
 const HARDSHIP_CASEY_CAPTION = "Casey hits 0.82. A person takes it from here.";
-const VOICE_LINE = "Hi John, this is RentRecovery, an AI assistant.";
+/** v6 voice line. Demo and teaser keep this so those renders stay stable. */
+export const VOICE_LINE = "Hi John, this is RentRecovery, an AI assistant.";
+/** Spoken line for the 11s intro and the 30s demo. */
+export const VOICE_LINE_V7 = "Hi John, this is RentRecovery, calling for Sunset Properties.";
 const PAY_CAPTION = "Link lands by text and email. Paid before the call ends.";
 const LOCKUP_CAPTION = "Built at the Supabase hackathon.";
 const TEASER_OFFER_CAPTION = "$800.00 today, $1,600.00 on the 14th. Lawn mowed Saturday.";
+const BENEFIT_CAPTION = "John's $800.00 is collected and $1,600.00 is scheduled. $6,760.00 of the $7,560.00 book is still open.";
 
-const introBeats: readonly IBeat[] = [
-    {
-        id: "late",
-        from: 0,
-        durationInFrames: 60,
-        caption: null,
-        srt: "RENT IS LATE.\nJohn Smith\n$2,400 overdue",
-    },
-    {
-        id: "chase",
-        from: 60,
-        durationInFrames: 60,
-        caption: null,
-        srt: "Someone has to chase it.\nNot anymore.",
-    },
-    {
-        id: "wake",
-        from: 120,
-        durationInFrames: 90,
-        caption: null,
-        srt: VOICE_LINE,
-    },
-    {
-        id: "split",
-        from: 210,
-        durationInFrames: 60,
-        caption: null,
-        srt: "$2,400 OVERDUE\n$800 PAID\n$1,600 SCHEDULED",
-    },
-    {
-        id: "brand",
-        from: 270,
-        durationInFrames: 60,
-        caption: null,
-        srt: "RentRecovery\nFrom overdue to paid.",
-    },
-];
+/** Casey replaces John late enough that her 0.82 gauge has settled when the second caption starts. */
+export const DEMO30_CASEY_ENTER_FRAME = 48;
+export const DEMO30_CASEY_SCORE_FRAMES = 12;
+export const DEMO30_CASEY_CAPTION_FRAME = DEMO30_CASEY_ENTER_FRAME + DEMO30_CASEY_SCORE_FRAMES;
+/** Local frame of "Send the link." The negotiation beat holds it for 2s. */
+export const DEMO30_LINK_FRAME = 72;
+export const DEMO30_FLAG_LINE = 0.75;
+
+function introBeats(voice: string, durations: readonly [number, number, number, number, number]): readonly IBeat[] {
+    const [late, chase, wake, split, brand] = durations;
+    const from = [
+        0,
+        late,
+        late + chase,
+        late + chase + wake,
+        late + chase + wake + split,
+    ];
+    return [
+        {
+            id: "late",
+            from: from[0] ?? 0,
+            durationInFrames: late,
+            caption: null,
+            srt: "RENT IS LATE.\nJohn Smith\n$2,400 overdue",
+        },
+        {
+            id: "chase",
+            from: from[1] ?? 0,
+            durationInFrames: chase,
+            caption: null,
+            srt: "Someone has to chase it.\nNot anymore.",
+        },
+        {
+            id: "wake",
+            from: from[2] ?? 0,
+            durationInFrames: wake,
+            caption: null,
+            srt: voice,
+        },
+        {
+            id: "split",
+            from: from[3] ?? 0,
+            durationInFrames: split,
+            caption: null,
+            srt: "$2,400 OVERDUE\n$800 PAID\n$1,600 SCHEDULED",
+        },
+        {
+            id: "brand",
+            from: from[4] ?? 0,
+            durationInFrames: brand,
+            caption: null,
+            srt: "RentRecovery\nFrom overdue to paid.",
+        },
+    ];
+}
+
+/** 11 seconds. Same card order as v6, with the Sunset Properties line. */
+const introBeatsV7 = introBeats(VOICE_LINE_V7, [60, 60, 90, 60, 60]);
+/** v6 open. Demo and teaser still start on this clock. */
+const introBeatsV6 = introBeats(VOICE_LINE, [60, 60, 90, 60, 60]);
+/**
+ * Tightened open for the 30s film. 7.2s so the new line, its fade, and the
+ * success chime all finish before the portfolio starts. Only this beat has sound.
+ */
+const introBeats30 = introBeats(VOICE_LINE_V7, [36, 36, 72, 36, 36]);
 
 function place(beats: readonly Omit<IBeat, "from">[], origin: number): IBeat[] {
     let cursor = origin;
@@ -150,7 +182,7 @@ const demoStory = place(
             srt: LOCKUP_CAPTION,
         },
     ],
-    introBeats.reduce((sum, beat) => sum + beat.durationInFrames, 0),
+    introBeatsV6.reduce((sum, beat) => sum + beat.durationInFrames, 0),
 );
 
 const teaserStory = place(
@@ -174,14 +206,61 @@ const teaserStory = place(
             srt: LOCKUP_CAPTION,
         },
     ],
-    introBeats.reduce((sum, beat) => sum + beat.durationInFrames, 0),
+    introBeatsV6.reduce((sum, beat) => sum + beat.durationInFrames, 0),
 );
 
-export const INTRO: IFilm = film("RentRecoveryIntro", introBeats);
-export const DEMO: IFilm = film("RentRecoveryDemo", [...introBeats, ...demoStory]);
-export const TEASER: IFilm = film("RentRecoveryTeaser", [...introBeats, ...teaserStory]);
+const demo30Story = place(
+    [
+        {
+            id: "portfolio",
+            durationInFrames: 120,
+            caption: PORTFOLIO_CAPTION,
+            srt: PORTFOLIO_CAPTION,
+        },
+        {
+            id: "chain",
+            durationInFrames: 150,
+            caption: WEBHOOK_CAPTION,
+            srt: WEBHOOK_CAPTION,
+        },
+        {
+            id: "call",
+            durationInFrames: 132,
+            caption: CALL_CAPTION,
+            srt: CALL_CAPTION,
+        },
+        {
+            id: "hardship",
+            durationInFrames: 120,
+            caption: HARDSHIP_JOHN_CAPTION,
+            cues: [
+                { from: 0, text: HARDSHIP_JOHN_CAPTION },
+                { from: DEMO30_CASEY_CAPTION_FRAME, text: HARDSHIP_CASEY_CAPTION },
+            ],
+            srt: HARDSHIP_JOHN_CAPTION,
+        },
+        {
+            id: "benefit",
+            durationInFrames: 102,
+            caption: BENEFIT_CAPTION,
+            srt: BENEFIT_CAPTION,
+        },
+        {
+            id: "lockup",
+            durationInFrames: 60,
+            caption: LOCKUP_CAPTION,
+            srt: LOCKUP_CAPTION,
+        },
+    ],
+    introBeats30.reduce((sum, beat) => sum + beat.durationInFrames, 0),
+);
 
-export const FILMS: readonly IFilm[] = [INTRO, DEMO, TEASER];
+export const INTRO: IFilm = film("RentRecoveryIntro", introBeatsV7);
+export const DEMO: IFilm = film("RentRecoveryDemo", [...introBeatsV6, ...demoStory]);
+export const TEASER: IFilm = film("RentRecoveryTeaser", [...introBeatsV6, ...teaserStory]);
+export const DEMO30: IFilm = film("RentRecoveryDemo30", [...introBeats30, ...demo30Story]);
+
+export const FILMS: readonly IFilm[] = [INTRO, DEMO, TEASER, DEMO30];
 
 export function beatById(filmSpec: IFilm, id: string): IBeat {
     const beat = filmSpec.beats.find((item) => item.id === id);

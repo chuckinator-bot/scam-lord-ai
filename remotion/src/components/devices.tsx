@@ -101,14 +101,17 @@ export function Phone({
 }
 
 export function Gauge({
+    flagLine = 0.35,
     score,
     width = 820,
 }: {
+    flagLine?: number;
     score: number;
     width?: number;
 }) {
     const clamped = Math.max(0, Math.min(1, score));
-    const hot = clamped >= 0.35;
+    const hot = clamped >= flagLine;
+    const marker = `${flagLine * 100}%`;
     return (
         <div style={ { width } }>
             <div
@@ -135,7 +138,7 @@ export function Gauge({
                     style={ {
                         background: theme.onMint,
                         bottom: -10,
-                        left: "35%",
+                        left: marker,
                         position: "absolute",
                         top: -10,
                         width: 3,
@@ -156,12 +159,12 @@ export function Gauge({
                 <span style={ { left: 0, position: "absolute" } }>0</span>
                 <span
                     style={ {
-                        left: "35%",
+                        left: marker,
                         position: "absolute",
                         transform: "translateX(-50%)",
                     } }
                 >
-                    0.35
+                    { flagLine.toFixed(2) }
                 </span>
                 <span style={ { position: "absolute", right: 0 } }>1</span>
             </div>

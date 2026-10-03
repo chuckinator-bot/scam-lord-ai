@@ -181,7 +181,7 @@ export function AgentChain({
                                 fontSize: nameSize,
                                 fontWeight: 600,
                                 letterSpacing: 1.1,
-                                lineHeight: "16px",
+                                lineHeight: nameSize > 18 ? `${Math.round(nameSize * 1.15)}px` : "16px",
                                 textTransform: "uppercase",
                             } }
                         >
@@ -193,7 +193,7 @@ export function AgentChain({
                                 fontFamily: fontSans,
                                 fontSize: labelSize,
                                 fontWeight: current ? 600 : 500,
-                                lineHeight: "20px",
+                                lineHeight: labelSize > 20 ? `${Math.round(labelSize * 1.2)}px` : "20px",
                                 marginTop: 4,
                             } }
                         >

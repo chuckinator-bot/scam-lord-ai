@@ -11,7 +11,7 @@ Not anymore.
 
 3
 00:00:04,000 --> 00:00:07,000
-Hi John, this is RentRecovery, an AI assistant.
+Hi John, this is RentRecovery, calling for Sunset Properties.
 
 4
 00:00:07,000 --> 00:00:09,000

@@ -12,6 +12,11 @@ import {
     CASEY_ENTER_FRAME,
     CASEY_SCORE_FRAMES,
     DEMO,
+    DEMO30,
+    DEMO30_CASEY_CAPTION_FRAME,
+    DEMO30_CASEY_ENTER_FRAME,
+    DEMO30_CASEY_SCORE_FRAMES,
+    DEMO30_LINK_FRAME,
     FILMS,
     filmToSrt,
     FPS,
@@ -19,6 +24,8 @@ import {
     INTRO,
     stillFrame,
     TEASER,
+    VOICE_LINE,
+    VOICE_LINE_V7,
 } from "./beats";
 
 function assertOrder(beats: readonly { from: number; durationInFrames: number }[]) {
@@ -45,6 +52,26 @@ describe("film durations", () => {
     it("keeps the teaser near 750 frames", () => {
         expect(Math.abs(TEASER.durationInFrames - 750)).toBeLessThanOrEqual(60);
         expect(TEASER.durationInFrames).toBe(750);
+    });
+
+    it("keeps the 30 second demo on a 900 frame clock", () => {
+        expect(DEMO30.durationInFrames).toBe(900);
+        expect(DEMO30.beats.map((beat) => beat.id)).toEqual([
+            "late",
+            "chase",
+            "wake",
+            "split",
+            "brand",
+            "portfolio",
+            "chain",
+            "call",
+            "hardship",
+            "benefit",
+            "lockup",
+        ]);
+        assertOrder(DEMO30.beats);
+        expect(beatById(DEMO30, "call").durationInFrames - DEMO30_LINK_FRAME).toBeGreaterThanOrEqual(2 * FPS);
+        expect(DEMO30.beats.some((beat) => beat.id === "pay")).toBe(false);
     });
 
     it("matches each film length to the sum of its beats", () => {
@@ -94,12 +121,16 @@ describe("beat order", () => {
         assertOrder(TEASER.beats);
     });
 
-    it("reuses the same intro frames in every film", () => {
-        for (const filmSpec of [DEMO, TEASER]) {
-            INTRO.beats.forEach((beat, index) => {
-                expect(filmSpec.beats[index]).toEqual(beat);
-            });
-        }
+    it("keeps the v6 intro clock on the demo and the teaser", () => {
+        TEASER.beats.slice(0, INTRO.beats.length).forEach((beat, index) => {
+            expect(beat).toEqual(DEMO.beats[index]);
+        });
+        expect(DEMO.beats[2]?.srt).toBe(VOICE_LINE);
+        expect(INTRO.beats[2]?.srt).toBe(VOICE_LINE_V7);
+        INTRO.beats.forEach((beat, index) => {
+            expect(beat.from).toBe(DEMO.beats[index]?.from);
+            expect(beat.durationInFrames).toBe(DEMO.beats[index]?.durationInFrames);
+        });
     });
 });
 
@@ -128,6 +159,21 @@ describe("captions", () => {
             "$800.00 today, $1,600.00 on the 14th. Lawn mowed Saturday.",
         );
         expect(beatById(TEASER, "lockup").caption).toBe("Built at the Supabase hackathon.");
+        expect(beatById(DEMO30, "portfolio").caption).toBe(
+            "Portfolio syncs to Supabase. Row-level security keeps each landlord in their own rows.",
+        );
+        expect(beatById(DEMO30, "chain").caption).toBe("The overdue invoice starts the call on its own.");
+        expect(beatById(DEMO30, "benefit").caption).toBe(
+            "John's $800.00 is collected and $1,600.00 is scheduled. $6,760.00 of the $7,560.00 book is still open.",
+        );
+        expect(beatById(DEMO30, "lockup").caption).toBe("Built at the Supabase hackathon.");
+        expect(beatById(DEMO30, "hardship").cues).toEqual([
+            { from: 0, text: "Every turn gets a hardship check." },
+            {
+                from: DEMO30_CASEY_CAPTION_FRAME,
+                text: "Casey hits 0.82. A person takes it from here.",
+            },
+        ]);
     });
 
     it("keeps every caption on screen for at least two seconds", () => {
@@ -156,6 +202,9 @@ describe("captions", () => {
         expect(johnStill).toBeLessThan(hardship.from + HARDSHIP_CASEY_CAPTION_FRAME);
         expect(caseyStill).toBeGreaterThanOrEqual(hardship.from + HARDSHIP_CASEY_CAPTION_FRAME);
         expect(caseyStill).toBeLessThan(hardship.from + hardship.durationInFrames);
+        expect(DEMO30_CASEY_CAPTION_FRAME).toBe(DEMO30_CASEY_ENTER_FRAME + DEMO30_CASEY_SCORE_FRAMES);
+        const short = beatById(DEMO30, "hardship");
+        expect(short.cues?.[1]?.from).toBe(DEMO30_CASEY_CAPTION_FRAME);
     });
 
     it("leaves the intro free of lower-third captions", () => {
@@ -168,9 +217,20 @@ describe("captions", () => {
         const srt = filmToSrt(INTRO);
         expect(srt.startsWith("1\n00:00:00,000 --> 00:00:02,000\nRENT IS LATE.")).toBe(true);
         expect(srt).toContain("00:00:09,000 --> 00:00:11,000\nRentRecovery\nFrom overdue to paid.");
-        expect(srt).toContain("Hi John, this is RentRecovery, an AI assistant.");
-        expect(srt).not.toContain("Sunset Properties");
+        expect(srt).toContain(VOICE_LINE_V7);
+        expect(srt).not.toContain("an AI assistant");
+        expect(srt).not.toContain("invoice.overdue");
         const demo = filmToSrt(DEMO);
+        expect(demo).toContain(VOICE_LINE);
+        expect(demo).not.toContain(VOICE_LINE_V7);
+        const teaser = filmToSrt(TEASER);
+        expect(teaser).toContain(VOICE_LINE);
+        const demo30 = filmToSrt(DEMO30);
+        expect(demo30).toContain(VOICE_LINE_V7);
+        expect(demo30).not.toContain("invoice.overdue");
+        expect(demo30).not.toContain("an AI assistant");
+        expect(demo30).not.toContain("Link lands by text and email");
+        expect(demo30.endsWith("Built at the Supabase hackathon.\n") || demo30.includes("Built at the Supabase hackathon.")).toBe(true);
         expect(demo).toContain("00:00:36,000 --> 00:00:41,600\nEvery turn gets a hardship check.");
         expect(demo).toContain("00:00:41,600 --> 00:00:46,000\nCasey hits 0.82. A person takes it from here.");
         expect(demo).toContain("00:00:53,700 --> 00:00:58,700\nBuilt at the Supabase hackathon.");
