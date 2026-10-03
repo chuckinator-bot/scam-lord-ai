@@ -35,11 +35,16 @@ ffmpeg -y -hide_banner -loglevel error \
     -filter_complex "[1]adelay=70|70[b];[2]adelay=140|140[c];[3]adelay=210|210[d];[0][b][c][d]amix=inputs=4:duration=longest:normalize=0" \
     "$TMP/success.wav"
 
-VOICE_DUR="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$AUDIO/voice.wav")"
-FADE_START="$(awk -v duration="$VOICE_DUR" 'BEGIN { printf "%.3f", duration - 0.167 }')"
+# Short line, normal speed. The /t/ in "assistant" is still present until 3.100s
+# on public/audio/voice.wav (RMS collapses after 3.08s). Whisper's word end
+# (2.900s) is early, so the 5-frame fade starts after the acoustic end.
+# The clip is delayed until the ring ends (2.95s) and finishes before the chime at 7.28s.
+SPEECH_END="3.100"
+FADE_START="$(awk -v end="$SPEECH_END" 'BEGIN { printf "%.3f", end + 0.040 }')"
+TAIL="$(awk -v start="$FADE_START" 'BEGIN { printf "%.3f", start + 0.167 }')"
 ffmpeg -y -hide_banner -loglevel error \
     -i "$AUDIO/voice.wav" \
-    -af "afade=t=out:st=${FADE_START}:d=0.167" \
+    -af "atrim=end=${TAIL},afade=t=out:st=${FADE_START}:d=0.167" \
     "$TMP/voice.wav"
 
 read -r INTRO_SEC DEMO_SEC TEASER_SEC < <(node --experimental-strip-types -e '
@@ -57,7 +62,7 @@ ffmpeg -y -hide_banner -loglevel error \
     -filter_complex "\
 [1]adelay=520|520,volume=0.95[n];\
 [2]adelay=2050|2050,volume=0.78[r];\
-[3]adelay=1050|1050,volume=0.95[v];\
+[3]adelay=3100|3100,volume=0.95[v];\
 [4]adelay=7280|7280,volume=0.92[s];\
 [0][n][r][v][s]amix=inputs=5:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95" \
     "$AUDIO/intro.wav"

@@ -3,7 +3,7 @@
  * Intro beats are listed once, on RentRecoveryIntro.
  */
 
-import { DEMO, INTRO, stillFrame, TEASER } from "../src/beats.ts";
+import { beatById, DEMO, HARDSHIP_CASEY_CAPTION_FRAME, INTRO, stillFrame, TEASER } from "../src/beats.ts";
 
 const introIds = new Set(["late", "chase", "wake", "split", "brand"]);
 
@@ -15,3 +15,7 @@ for (const film of [INTRO, DEMO, TEASER]) {
         console.log(`${film.id} ${beat.id} ${stillFrame(beat)}`);
     }
 }
+
+const hardship = beatById(DEMO, "hardship");
+console.log(`RentRecoveryDemo hardship-john ${hardship.from + 90}`);
+console.log(`RentRecoveryDemo hardship-casey ${hardship.from + HARDSHIP_CASEY_CAPTION_FRAME + 72}`);

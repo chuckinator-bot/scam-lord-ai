@@ -70,6 +70,29 @@ export interface IConnector {
  * @param nodeWidth - Card width in pixels.
  * @param nodeHeight - Card height in pixels.
  */
+/**
+ * Horizontal edge from the right edge of the source card to the left edge of the target.
+ * Both ends sit just outside the cards, so the stroke does not enter either card.
+ * @param from - Source card layout.
+ * @param to - Target card layout.
+ * @param nodeWidth - Card width in pixels.
+ * @param nodeHeight - Card height in pixels.
+ */
+export function edgeConnector(
+    from: INodeLayout,
+    to: INodeLayout,
+    nodeWidth: number,
+    nodeHeight: number,
+): IConnector {
+    const inset = 2;
+    return {
+        x1: from.x + nodeWidth + inset,
+        x2: to.x - inset,
+        y1: from.y + nodeHeight / 2,
+        y2: to.y + nodeHeight / 2,
+    };
+}
+
 export function handoffConnector(
     jev: INodeLayout,
     handoff: INodeLayout,

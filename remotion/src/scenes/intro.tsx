@@ -314,7 +314,7 @@ export function WakeBeat() {
                         maxWidth: 640,
                     } }
                 >
-                    Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties
+                    Hi John, this is RentRecovery, an AI assistant.
                 </div>
             </div>
         </AbsoluteFill>

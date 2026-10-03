@@ -8,12 +8,12 @@
 import { fontSans } from "../fonts";
 import {
     AGENT_EDGES,
+    edgeConnector,
     edgeDotCenter,
     handoffConnector,
     layoutChain,
     MAIN_PATH,
     STEP_LABEL,
-    type INodeLayout,
 } from "../floor-layout";
 import type { TAgentStep } from "../../../src/lib/agent-floor/agents";
 import { theme } from "../theme";
@@ -21,10 +21,6 @@ import { StatusBadge } from "./chrome";
 import type { TStatus } from "../theme";
 
 const DOT_RADIUS = 6;
-
-function centerOf(node: INodeLayout, nodeWidth: number, nodeHeight: number): { x: number; y: number } {
-    return { x: node.x + nodeWidth / 2, y: node.y + nodeHeight / 2 };
-}
 
 export function AgentChain({
     tenant,
@@ -73,12 +69,7 @@ export function AgentChain({
                         : targetIndex >= 0 && litThrough >= targetIndex;
                     const ends = target === "handoff"
                         ? handoffConnector(from, to, nodeWidth, nodeHeight)
-                        : {
-                            x1: centerOf(from, nodeWidth, nodeHeight).x,
-                            x2: centerOf(to, nodeWidth, nodeHeight).x,
-                            y1: centerOf(from, nodeWidth, nodeHeight).y,
-                            y2: centerOf(to, nodeWidth, nodeHeight).y,
-                        };
+                        : edgeConnector(from, to, nodeWidth, nodeHeight);
                     return (
                         <line
                             key={ `${source}-${target}` }

@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import { AGENT_EDGES, AGENT_STEPS } from "../../src/lib/agent-floor/agents";
 import {
     chainSideMargin,
+    edgeConnector,
     edgeDotCenter,
     handoffConnector,
     HERO_GAP,
@@ -59,6 +60,24 @@ describe("agent floor layout", () => {
     it("leaves at least 64px on each side of the hero chain", () => {
         expect(chainSideMargin(HERO_NODE_WIDTH, HERO_GAP)).toBeGreaterThanOrEqual(64);
         expect(HERO_NODE_WIDTH / 168).toBeCloseTo(1.25, 2);
+    });
+
+    it("stops main-path connectors on the card edges", () => {
+        const nodeWidth = 156;
+        const gap = 16;
+        const nodeHeight = 84;
+        const layout = layoutChain(nodeWidth, gap, 100);
+        const plan = layout.find((node) => node.step === "plan");
+        const link = layout.find((node) => node.step === "payment_link");
+        const paid = layout.find((node) => node.step === "paid");
+        const toLink = edgeConnector(plan!, link!, nodeWidth, nodeHeight);
+        const toPaid = edgeConnector(link!, paid!, nodeWidth, nodeHeight);
+        expect(toLink.x1).toBeGreaterThanOrEqual((plan?.x ?? 0) + nodeWidth);
+        expect(toLink.x2).toBeLessThanOrEqual(link?.x ?? 0);
+        expect(toPaid.x1).toBeGreaterThanOrEqual((link?.x ?? 0) + nodeWidth);
+        expect(toPaid.x2).toBeLessThanOrEqual(paid?.x ?? 0);
+        expect(toLink.x2).toBeGreaterThan(toLink.x1);
+        expect(toLink.y1).toBe(nodeHeight / 2);
     });
 
     it("stops the handoff connector on the card edges", () => {

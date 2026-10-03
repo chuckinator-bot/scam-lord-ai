@@ -6,8 +6,8 @@
  */
 
 import type { ReactNode } from "react";
-import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
-import { beatById, DEMO, INTRO, TEASER, type IFilm } from "./beats";
+import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame } from "remotion";
+import { beatById, DEMO, INTRO, TEASER, type IBeat, type IFilm } from "./beats";
 import { fontSans } from "./fonts";
 import { Caption, Snap } from "./components/chrome";
 import { BrandBeat, ChaseBeat, LateBeat, SplitBeat, WakeBeat } from "./scenes/intro";
@@ -41,7 +41,50 @@ function Beat({
             name={ beat.id }
         >
             <Snap amount={ snap }>{ children }</Snap>
-            { beat.caption ? <Caption text={ beat.caption } /> : null }
+            <BeatCaption beat={ beat } />
+        </Sequence>
+    );
+}
+
+function BeatCaption({ beat }: { beat: IBeat }) {
+    const cues = beat.cues;
+    if (cues && cues.length > 0) {
+        return <CuedCaption
+            beat={ beat }
+            cues={ cues }
+        />;
+    }
+    return beat.caption ? <Caption text={ beat.caption } /> : null;
+}
+
+function CuedCaption({
+    beat,
+    cues,
+}: {
+    beat: IBeat;
+    cues: NonNullable<IBeat["cues"]>;
+}) {
+    const frame = useCurrentFrame();
+    let active = cues[0];
+    let nextFrom = beat.durationInFrames;
+    for (let index = 0; index < cues.length; index += 1) {
+        const cue = cues[index];
+        if (cue && frame >= cue.from) {
+            active = cue;
+            nextFrom = cues[index + 1]?.from ?? beat.durationInFrames;
+        }
+    }
+    if (!active) {
+        return null;
+    }
+    return (
+        <Sequence
+            durationInFrames={ nextFrom - active.from }
+            from={ active.from }
+            layout="none"
+            name={ `${beat.id}-caption` }
+        >
+            <Caption text={ active.text } />
         </Sequence>
     );
 }

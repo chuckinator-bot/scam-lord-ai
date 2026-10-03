@@ -11,7 +11,7 @@ Not anymore.
 
 3
 00:00:04,000 --> 00:00:07,000
-Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties...
+Hi John, this is RentRecovery, an AI assistant.
 
 4
 00:00:07,000 --> 00:00:09,000
@@ -29,21 +29,25 @@ From overdue to paid.
 Portfolio syncs to Supabase. Row-level security keeps each landlord in their own rows.
 
 7
-00:00:20,000 --> 00:00:30,000
+00:00:20,000 --> 00:00:27,000
 The overdue invoice starts the call on its own.
 
 8
-00:00:30,000 --> 00:00:48,000
+00:00:27,000 --> 00:00:36,000
 Tenant asks for 4 payments. Policy caps it at 2, and Claude counters inside that limit.
 
 9
-00:00:48,000 --> 00:00:58,000
-Hardship score hits 0.82. A person takes it from here.
+00:00:36,000 --> 00:00:41,600
+Every turn gets a hardship check.
 
 10
-00:00:58,000 --> 00:01:08,000
-Link lands by text and email. Paid before the call ends.
+00:00:41,600 --> 00:00:46,000
+Casey hits 0.82. A person takes it from here.
 
 11
-00:01:08,000 --> 00:01:18,000
+00:00:46,000 --> 00:00:53,700
+Link lands by text and email. Paid before the call ends.
+
+12
+00:00:53,700 --> 00:00:58,700
 Built at the Supabase hackathon.

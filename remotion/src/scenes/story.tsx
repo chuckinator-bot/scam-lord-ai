@@ -6,6 +6,11 @@
  */
 
 import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import {
+    CALL_LINK_FRAME,
+    CASEY_ENTER_FRAME,
+    CASEY_SCORE_FRAMES,
+} from "../beats";
 import { AgentChain } from "../components/AgentChain";
 import {
     AgentBanner,
@@ -317,7 +322,7 @@ const TURNS: ReadonlyArray<{
         text: "$800.00 today and $1,600.00 on the 14th. We'll mow the lawn Saturday.",
     },
     {
-        at: 280,
+        at: CALL_LINK_FRAME,
         plan: false,
         speaker: "John Smith",
         tenant: true,
@@ -328,8 +333,8 @@ const TURNS: ReadonlyArray<{
 export function CallScene() {
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
-    const lit = frame < 110 ? 3 : frame < 190 ? 4.2 : frame < 280 ? 5.15 : 6.3;
-    const active = frame < 110 ? "disclosure" : frame < 190 ? "jev" : frame < 280 ? "policy" : "plan";
+    const lit = frame < 110 ? 3 : frame < 190 ? 4.2 : frame < CALL_LINK_FRAME ? 5.15 : 6.3;
+    const active = frame < 110 ? "disclosure" : frame < 190 ? "jev" : frame < CALL_LINK_FRAME ? "policy" : "plan";
     const policyIn = spring({
         config: { damping: 14, stiffness: 140 },
         fps,
@@ -493,10 +498,10 @@ function PolicyRow({ label, value }: { label: string; value: string }) {
 
 export function HardshipScene() {
     const frame = useCurrentFrame();
-    const casey = frame >= 132;
-    const local = casey ? frame - 132 : frame;
+    const casey = frame >= CASEY_ENTER_FRAME;
+    const local = casey ? frame - CASEY_ENTER_FRAME : frame;
     const hardship = casey
-        ? interpolate(local, [0, 36], [0.2, 0.82], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+        ? interpolate(local, [0, CASEY_SCORE_FRAMES], [0.2, 0.82], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
         : interpolate(local, [0, 24], [0, 0.12], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
     const questions = casey
         ? CASEY_QUESTIONS.map((question) => question.name === "Hardship" ? { ...question, score: hardship } : question)

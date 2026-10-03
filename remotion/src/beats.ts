@@ -9,13 +9,33 @@ export const FPS = 30;
 export const WIDTH = 1920;
 export const HEIGHT = 1080;
 
+/** Local frame when "Send the link." lands. The call beat holds that line for 2s. */
+export const CALL_LINK_FRAME = 210;
+
+/** Casey's gauges replace John's, then her hardship score eases onto 0.82. */
+export const CASEY_ENTER_FRAME = 132;
+export const CASEY_SCORE_FRAMES = 36;
+/** Local frame when Casey's hardship gauge has settled on 0.82. */
+export const HARDSHIP_CASEY_CAPTION_FRAME = CASEY_ENTER_FRAME + CASEY_SCORE_FRAMES;
+
+export interface ICaptionCue {
+    /** Local frame when this lower third appears. */
+    readonly from: number;
+    readonly text: string;
+}
+
 export interface IBeat {
     readonly id: string;
     readonly from: number;
     readonly durationInFrames: number;
     /** Burned-in lower third. Null during the shared intro. */
     readonly caption: string | null;
-    /** Line written into the .srt for this beat. */
+    /**
+     * Timed lower thirds inside one beat. When set, these replace `caption`
+     * on screen and in the .srt so a scene can keep a single frame clock.
+     */
+    readonly cues?: readonly ICaptionCue[];
+    /** Line written into the .srt for this beat, when `cues` is absent. */
     readonly srt: string;
 }
 
@@ -28,7 +48,9 @@ export interface IFilm {
 const PORTFOLIO_CAPTION = "Portfolio syncs to Supabase. Row-level security keeps each landlord in their own rows.";
 const WEBHOOK_CAPTION = "The overdue invoice starts the call on its own.";
 const CALL_CAPTION = "Tenant asks for 4 payments. Policy caps it at 2, and Claude counters inside that limit.";
-const HARDSHIP_CAPTION = "Hardship score hits 0.82. A person takes it from here.";
+const HARDSHIP_JOHN_CAPTION = "Every turn gets a hardship check.";
+const HARDSHIP_CASEY_CAPTION = "Casey hits 0.82. A person takes it from here.";
+const VOICE_LINE = "Hi John, this is RentRecovery, an AI assistant.";
 const PAY_CAPTION = "Link lands by text and email. Paid before the call ends.";
 const LOCKUP_CAPTION = "Built at the Supabase hackathon.";
 const TEASER_OFFER_CAPTION = "$800.00 today, $1,600.00 on the 14th. Lawn mowed Saturday.";
@@ -53,7 +75,7 @@ const introBeats: readonly IBeat[] = [
         from: 120,
         durationInFrames: 90,
         caption: null,
-        srt: "Hi John, this is RentRecovery, an AI assistant calling on behalf of Sunset Properties",
+        srt: VOICE_LINE,
     },
     {
         id: "split",
@@ -101,15 +123,19 @@ const demoStory = place(
         },
         {
             id: "call",
-            durationInFrames: 340,
+            durationInFrames: 270,
             caption: CALL_CAPTION,
             srt: CALL_CAPTION,
         },
         {
             id: "hardship",
             durationInFrames: 300,
-            caption: HARDSHIP_CAPTION,
-            srt: HARDSHIP_CAPTION,
+            caption: HARDSHIP_JOHN_CAPTION,
+            cues: [
+                { from: 0, text: HARDSHIP_JOHN_CAPTION },
+                { from: HARDSHIP_CASEY_CAPTION_FRAME, text: HARDSHIP_CASEY_CAPTION },
+            ],
+            srt: HARDSHIP_JOHN_CAPTION,
         },
         {
             id: "pay",
@@ -184,12 +210,34 @@ export function framesToTimestamp(frame: number): string {
     return `${pad(hours, 2)}:${pad(minutes, 2)}:${pad(seconds, 2)},${pad(millis, 3)}`;
 }
 
+interface ISrtBlock {
+    readonly end: number;
+    readonly start: number;
+    readonly text: string;
+}
+
+function srtBlocks(beat: IBeat): ISrtBlock[] {
+    if (beat.cues && beat.cues.length > 0) {
+        return beat.cues.map((cue, index) => ({
+            end: beat.from + (beat.cues?.[index + 1]?.from ?? beat.durationInFrames),
+            start: beat.from + cue.from,
+            text: cue.text,
+        }));
+    }
+    return [{
+        end: beat.from + beat.durationInFrames,
+        start: beat.from,
+        text: beat.srt,
+    }];
+}
+
 export function filmToSrt(filmSpec: IFilm): string {
     return filmSpec.beats
-        .map((beat, index) => {
-            const start = framesToTimestamp(beat.from);
-            const end = framesToTimestamp(beat.from + beat.durationInFrames);
-            return `${index + 1}\n${start} --> ${end}\n${beat.srt}\n`;
+        .flatMap((beat) => srtBlocks(beat))
+        .map((block, index) => {
+            const start = framesToTimestamp(block.start);
+            const end = framesToTimestamp(block.end);
+            return `${index + 1}\n${start} --> ${end}\n${block.text}\n`;
         })
         .join("\n");
 }
