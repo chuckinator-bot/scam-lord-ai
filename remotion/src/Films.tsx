@@ -25,7 +25,7 @@ import { fontSans } from "./fonts";
 import { Caption, Snap } from "./components/chrome";
 import { DEMO30_POLICY_FRAME, DEMO30_TURNS } from "./demo30-story";
 import { BrandBeat, ChaseBeat, LateBeat, SplitBeat, WakeBeat } from "./scenes/intro";
-import { Demo30Benefit, Demo30Chain, Demo30Portfolio } from "./scenes/demo30";
+import { Demo30Benefit, Demo30Chain, Demo30Close, Demo30Portfolio, Demo30Stakes, Demo30Wake } from "./scenes/demo30";
 import {
     CallScene,
     HardshipScene,
@@ -254,10 +254,27 @@ export function Demo30Film() {
         <AbsoluteFill style={ { fontFamily: fontSans } }>
             <style>{ `* { font-family: ${fontSans}, sans-serif; }` }</style>
             <Audio src={ staticFile("audio/demo30.wav") } />
-            <IntroBeats
-                edition="v7"
+            <Beat
                 film={ DEMO30 }
-            />
+                id="stakes"
+                snap={ 0.03 }
+            >
+                <Demo30Stakes />
+            </Beat>
+            <Beat
+                film={ DEMO30 }
+                id="wake"
+                snap={ 0.03 }
+            >
+                <Demo30Wake />
+            </Beat>
+            <Beat
+                film={ DEMO30 }
+                id="close"
+                snap={ 0.02 }
+            >
+                <Demo30Close />
+            </Beat>
             <Beat
                 film={ DEMO30 }
                 id="portfolio"

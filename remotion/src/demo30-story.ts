@@ -19,17 +19,23 @@ export const OPEN_DOLLARS = BOOK_DOLLARS - COLLECTED_DOLLARS;
 export const ARRANGED_DOLLARS = COLLECTED_DOLLARS + SCHEDULED_DOLLARS;
 /** Casey, Avery, and Blake. Their balances are not part of John's plan. */
 export const UNTOUCHED_DOLLARS = OPEN_DOLLARS - SCHEDULED_DOLLARS;
+/** John's $2,400 is resolved, so past due falls from the roster total to what remains. */
+export const PAST_DUE_END = BOOK_DOLLARS - ARRANGED_DOLLARS;
+export const PLAN_LINE = "$800 collected · $1,600 on a plan";
+export const ROI_LINE = "$2,400 arranged · 1 call · 0 staff hours";
+export const SATISFACTION_FROM = 3.8;
+export const SATISFACTION_TO = 4.6;
 
 export const SYNC_HEADLINE = "Syncing from your property management software";
 export const SOURCE_NAME = "AppFolio";
 
-/** One property, unit, lease, and tenant per roster row. One work order: Saturday's lawn. */
+/** Portfolio totals. The table underneath is only the rows that need attention. */
 export const PORTFOLIO_COUNTS: readonly (readonly [string, number])[] = [
-    ["Properties", TENANTS.length],
-    ["Units", TENANTS.length],
-    ["Leases", TENANTS.length],
-    ["Tenants", TENANTS.length],
-    ["Work Orders", 1],
+    ["Properties", 18],
+    ["Units", 63],
+    ["Leases", 61],
+    ["Tenants", 72],
+    ["Work Orders", 14],
 ];
 
 export function dollars(amount: number): string {

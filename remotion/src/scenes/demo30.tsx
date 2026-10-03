@@ -16,19 +16,21 @@ import {
     LockIcon,
     Logo,
     StatusBadge,
+    Tick,
 } from "../components/chrome";
+import { BigAmount, Phone, Waveform } from "../components/devices";
+import { VOICE_LINE_V7 } from "../beats";
 import {
-    ARRANGED_DOLLARS,
     BOOK_DOLLARS,
-    bookPercent,
-    COLLECTED_DOLLARS,
     dollars,
-    OPEN_DOLLARS,
+    PAST_DUE_END,
+    PLAN_LINE,
     PORTFOLIO_COUNTS,
-    SCHEDULED_DOLLARS,
+    ROI_LINE,
+    SATISFACTION_FROM,
+    SATISFACTION_TO,
     SOURCE_NAME,
     SYNC_HEADLINE,
-    UNTOUCHED_DOLLARS,
 } from "../demo30-story";
 import { fontDisplay, fontSans } from "../fonts";
 import { TENANTS } from "../roster";
@@ -152,12 +154,20 @@ export function Demo30Portfolio() {
             >
                 <div
                     style={ {
+                        background: theme.surfaceSunken,
+                        padding: "14px 20px 8px",
+                    } }
+                >
+                    <div style={ { fontFamily: fontDisplay, fontSize: 32 } }>Needs attention</div>
+                </div>
+                <div
+                    style={ {
                         ...labelStyle,
                         background: theme.surfaceSunken,
                         columnGap: 24,
                         display: "grid",
                         gridTemplateColumns: "minmax(0, 1fr) 180px 240px",
-                        padding: "12px 20px",
+                        padding: "8px 20px 12px",
                     } }
                 >
                     <span>Tenancy</span>
@@ -256,49 +266,239 @@ export function Demo30Chain() {
     );
 }
 
-function MoneyTile({
-    amount,
-    detail,
-    label,
-}: {
-    amount: string;
-    detail: string;
-    label: string;
-}) {
+const STAR_PATH = "M12 1.8 14.7 8.2 21.6 8.8 16.4 13.4 18.1 20.2 12 16.6 5.9 20.2 7.6 13.4 2.4 8.8 9.3 8.2 Z";
+
+function Star({ fill, index }: { fill: number; index: number }) {
+    const clip = `sat-star-${index}`;
     return (
-        <div
+        <svg
+            height={ 88 }
+            viewBox="0 0 24 24"
+            width={ 88 }
+        >
+            <defs>
+                <clipPath id={ clip }>
+                    <rect
+                        height="24"
+                        width={ 24 * fill }
+                        x="0"
+                        y="0"
+                    />
+                </clipPath>
+            </defs>
+            <path
+                d={ STAR_PATH }
+                fill={ theme.surfaceSunken }
+                stroke={ theme.ink }
+                strokeWidth={ 0.8 }
+            />
+            <path
+                clipPath={ `url(#${clip})` }
+                d={ STAR_PATH }
+                fill={ theme.ink }
+            />
+        </svg>
+    );
+}
+
+export function Demo30Stakes() {
+    return (
+        <AbsoluteFill
             style={ {
-                background: theme.surface,
-                border: `1px solid ${theme.border}`,
-                borderRadius: theme.radiusLg,
-                flex: 1,
-                padding: "18px 20px",
+                alignItems: "center",
+                background: theme.ink,
+                color: theme.mint,
+                fontFamily: fontDisplay,
+                justifyContent: "center",
+                padding: "72px 96px",
             } }
         >
-            <div style={ labelStyle }>{ label }</div>
+            <div
+                style={ {
+                    fontSize: 108,
+                    letterSpacing: -2.5,
+                    lineHeight: 0.92,
+                    textAlign: "center",
+                } }
+            >
+                RENT IS LATE.
+            </div>
+            <div
+                style={ {
+                    alignItems: "center",
+                    background: theme.white,
+                    border: `2px solid ${theme.mint}`,
+                    borderRadius: theme.radiusLg,
+                    color: theme.ink,
+                    display: "flex",
+                    fontFamily: fontSans,
+                    gap: 28,
+                    marginTop: 28,
+                    padding: "16px 28px",
+                } }
+            >
+                <div>
+                    <div style={ { fontSize: 28, fontWeight: 600 } }>John Smith</div>
+                    <div style={ { fontFamily: fontDisplay, fontSize: 36, marginTop: 4 } }>$2,400 overdue</div>
+                </div>
+                <div
+                    style={ {
+                        background: theme.mint,
+                        borderRadius: theme.radiusPill,
+                        fontSize: 18,
+                        fontWeight: 600,
+                        padding: "8px 14px",
+                    } }
+                >
+                    Overdue
+                </div>
+            </div>
+            <div style={ { fontSize: 48, letterSpacing: -0.8, marginTop: 48, textAlign: "center" } }>
+                Someone has to chase it.
+            </div>
+            <div style={ { fontSize: 92, letterSpacing: -2, marginTop: 8, textAlign: "center" } }>
+                Not anymore.
+            </div>
+        </AbsoluteFill>
+    );
+}
+
+export function Demo30Wake() {
+    const frame = useCurrentFrame();
+    const { fps } = useVideoConfig();
+    const logo = spring({
+        config: { damping: 14, stiffness: 140 },
+        fps,
+        frame,
+    });
+    return (
+        <AbsoluteFill style={ { background: theme.ink, color: theme.mint } }>
+            <div
+                style={ {
+                    left: 120,
+                    opacity: logo,
+                    position: "absolute",
+                    top: 72,
+                } }
+            >
+                <Logo
+                    markHeight={ 96 }
+                    tone="dark"
+                    wordmarkSize={ 52 }
+                />
+            </div>
             <div
                 style={ {
                     fontFamily: fontDisplay,
-                    fontSize: 40,
-                    fontVariantNumeric: "tabular-nums",
-                    marginTop: 8,
+                    fontSize: 72,
+                    left: 120,
+                    letterSpacing: -1.5,
+                    position: "absolute",
+                    top: 240,
                 } }
             >
-                { amount }
+                RentRecovery wakes up
             </div>
-            <div style={ { color: theme.mutedInk, fontSize: 18, marginTop: 6 } }>{ detail }</div>
-        </div>
+            <div
+                style={ {
+                    alignItems: "center",
+                    display: "flex",
+                    gap: 36,
+                    left: 120,
+                    position: "absolute",
+                    right: 120,
+                    top: 420,
+                } }
+            >
+                <Phone width={ 250 }>
+                    <div style={ { fontSize: 13, fontWeight: 600, letterSpacing: 1.4 } }>CALLING</div>
+                    <div style={ { fontFamily: fontDisplay, fontSize: 28, marginTop: 16 } }>John Smith</div>
+                    <div style={ { marginTop: 28 } }>
+                        <Waveform
+                            bars={ 16 }
+                            color={ theme.ink }
+                            height={ 64 }
+                        />
+                    </div>
+                </Phone>
+                <div
+                    style={ {
+                        fontFamily: fontSans,
+                        fontSize: 36,
+                        fontWeight: 600,
+                        lineHeight: "48px",
+                        maxWidth: 820,
+                    } }
+                >
+                    { VOICE_LINE_V7 }
+                </div>
+            </div>
+        </AbsoluteFill>
+    );
+}
+
+export function Demo30Close() {
+    return (
+        <AbsoluteFill
+            style={ {
+                alignItems: "center",
+                background: theme.brandMint,
+                justifyContent: "center",
+                padding: "64px 72px",
+            } }
+        >
+            <div style={ { alignItems: "center", display: "flex", gap: 28 } }>
+                <BigAmount
+                    amount="$2,400"
+                    label="OVERDUE"
+                    tone="overdue"
+                />
+                <div style={ { position: "relative" } }>
+                    <BigAmount
+                        amount="$800"
+                        label="PAID"
+                        tone="paid"
+                    />
+                    <div style={ { position: "absolute", right: -8, top: -12 } }>
+                        <Tick size={ 54 } />
+                    </div>
+                </div>
+                <BigAmount
+                    amount="$1,600"
+                    label="SCHEDULED"
+                    tone="ink"
+                />
+            </div>
+            <div style={ { marginTop: 56 } }>
+                <Logo
+                    markHeight={ 120 }
+                    tone="mint"
+                    wordmarkSize={ 72 }
+                />
+            </div>
+            <div
+                style={ {
+                    color: theme.onMint,
+                    fontFamily: fontDisplay,
+                    fontSize: 48,
+                    letterSpacing: -0.8,
+                    marginTop: 28,
+                } }
+            >
+                From overdue to paid.
+            </div>
+        </AbsoluteFill>
     );
 }
 
 export function Demo30Benefit() {
     const frame = useCurrentFrame();
-    const open = Math.round(interpolate(frame, [8, 48], [BOOK_DOLLARS, OPEN_DOLLARS], {
+    const pastDue = Math.round(interpolate(frame, [8, 52], [BOOK_DOLLARS, PAST_DUE_END], {
         easing: Easing.inOut(Easing.cubic),
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
     }));
-    const share = interpolate(frame, [16, 64], [0, ARRANGED_DOLLARS / BOOK_DOLLARS], {
+    const score = interpolate(frame, [8, 52], [SATISFACTION_FROM, SATISFACTION_TO], {
         easing: Easing.out(Easing.cubic),
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
@@ -309,128 +509,121 @@ export function Demo30Benefit() {
             style={ {
                 background: theme.bg,
                 color: theme.ink,
+                display: "flex",
+                flexDirection: "column",
                 fontFamily: fontSans,
-                padding: "36px 64px 168px",
+                gap: 18,
+                padding: "28px 56px 148px",
             } }
         >
-            <div style={ { alignItems: "center", display: "flex", justifyContent: "space-between" } }>
-                <div>
-                    <div style={ labelStyle }>Collections</div>
-                    <div style={ { fontFamily: fontDisplay, fontSize: 48, marginTop: 6 } }>What the owner gets</div>
-                </div>
-                <div
-                    style={ {
-                        background: theme.surfaceSunken,
-                        border: `1px solid ${theme.border}`,
-                        borderRadius: theme.radiusPill,
-                        color: theme.mutedInk,
-                        fontSize: 16,
-                        fontWeight: 600,
-                        padding: "6px 12px",
-                    } }
-                >
-                    Demo data
-                </div>
-            </div>
             <div
                 style={ {
-                    alignItems: "flex-end",
+                    background: theme.surface,
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: theme.radiusLg,
                     display: "flex",
-                    gap: 28,
-                    marginTop: 22,
+                    flex: 1.35,
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    padding: "28px 36px",
+                    position: "relative",
                 } }
             >
-                <div style={ { flex: 1.1 } }>
-                    <div style={ labelStyle }>Still open</div>
-                    <div
-                        style={ {
-                            fontFamily: fontDisplay,
-                            fontSize: 92,
-                            fontVariantNumeric: "tabular-nums",
-                            letterSpacing: -2,
-                            lineHeight: 0.95,
-                            marginTop: 6,
-                        } }
-                    >
-                        { dollars(open) }
-                    </div>
-                    <div style={ { color: theme.mutedInk, fontSize: 20, marginTop: 8 } }>
-                        { `Started at ${dollars(BOOK_DOLLARS)}. Collected ${dollars(COLLECTED_DOLLARS)} today.` }
-                    </div>
-                </div>
                 <div
                     style={ {
-                        background: theme.surface,
-                        border: `1px solid ${theme.border}`,
-                        borderRadius: theme.radiusLg,
-                        padding: "18px 22px",
-                        width: 520,
+                        position: "absolute",
+                        right: 28,
+                        top: 22,
                     } }
                 >
-                    <div style={ labelStyle }>Owner satisfaction</div>
-                    <div style={ { fontFamily: fontDisplay, fontSize: 36, marginTop: 8 } }>Up</div>
                     <div
                         style={ {
                             background: theme.surfaceSunken,
+                            border: `1px solid ${theme.border}`,
                             borderRadius: theme.radiusPill,
-                            height: 22,
-                            marginTop: 14,
-                            overflow: "hidden",
+                            color: theme.mutedInk,
+                            fontSize: 16,
+                            fontWeight: 600,
+                            padding: "6px 12px",
                         } }
                     >
-                        <div
-                            style={ {
-                                background: theme.mint,
-                                borderRadius: theme.radiusPill,
-                                height: "100%",
-                                width: `${share * 100}%`,
-                            } }
-                        />
-                    </div>
-                    <div style={ { fontSize: 18, marginTop: 10 } }>
-                        { `${bookPercent(ARRANGED_DOLLARS)} of this book is collected or scheduled` }
+                        Demo data
                     </div>
                 </div>
-            </div>
-            <div style={ { display: "flex", gap: 16, marginTop: 22 } }>
-                <MoneyTile
-                    amount={ dollars(COLLECTED_DOLLARS) }
-                    detail={ `${bookPercent(COLLECTED_DOLLARS)} of ${dollars(BOOK_DOLLARS)} collected` }
-                    label="Collected"
-                />
-                <MoneyTile
-                    amount={ dollars(SCHEDULED_DOLLARS) }
-                    detail={ `${bookPercent(SCHEDULED_DOLLARS)} scheduled, still open` }
-                    label="Scheduled"
-                />
-                <MoneyTile
-                    amount={ dollars(UNTOUCHED_DOLLARS) }
-                    detail="Casey, Avery, and Blake"
-                    label="Untouched"
-                />
+                <div style={ { ...labelStyle, fontSize: 22 } }>Past due</div>
+                <div
+                    style={ {
+                        fontFamily: fontDisplay,
+                        fontSize: 128,
+                        fontVariantNumeric: "tabular-nums",
+                        letterSpacing: -3,
+                        lineHeight: 0.92,
+                        marginTop: 8,
+                    } }
+                >
+                    { dollars(pastDue) }
+                </div>
+                <div style={ { fontSize: 28, fontWeight: 600, marginTop: 12 } }>
+                    { PLAN_LINE }
+                </div>
             </div>
             <div
                 style={ {
                     background: theme.surface,
                     border: `1px solid ${theme.border}`,
                     borderRadius: theme.radiusLg,
-                    marginTop: 16,
-                    padding: "16px 22px",
+                    display: "flex",
+                    flex: 0.8,
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    padding: "24px 36px",
                 } }
             >
-                <div style={ labelStyle }>Return on this book</div>
-                <div style={ { display: "flex", gap: 32, marginTop: 10 } }>
-                    { [
-                        ["Collected", COLLECTED_DOLLARS],
-                        ["Scheduled", SCHEDULED_DOLLARS],
-                        ["Arranged", ARRANGED_DOLLARS],
-                    ].map(([label, amount]) => (
-                        <div key={ String(label) }>
-                            <div style={ { color: theme.mutedInk, fontSize: 16 } }>{ label }</div>
-                            <div style={ { fontFamily: fontDisplay, fontSize: 28, marginTop: 2 } }>
-                                { `${dollars(Number(amount))} · ${bookPercent(Number(amount))}` }
-                            </div>
-                        </div>
+                <div style={ { ...labelStyle, fontSize: 22 } }>ROI</div>
+                <div
+                    style={ {
+                        fontFamily: fontDisplay,
+                        fontSize: 52,
+                        letterSpacing: -0.8,
+                        marginTop: 10,
+                    } }
+                >
+                    { ROI_LINE }
+                </div>
+            </div>
+            <div
+                style={ {
+                    alignItems: "center",
+                    background: theme.surface,
+                    border: `1px solid ${theme.border}`,
+                    borderRadius: theme.radiusLg,
+                    display: "flex",
+                    flex: 1,
+                    justifyContent: "space-between",
+                    padding: "24px 36px",
+                } }
+            >
+                <div>
+                    <div style={ { ...labelStyle, fontSize: 22 } }>Owner satisfaction</div>
+                    <div
+                        style={ {
+                            fontFamily: fontDisplay,
+                            fontSize: 72,
+                            fontVariantNumeric: "tabular-nums",
+                            letterSpacing: -1,
+                            marginTop: 8,
+                        } }
+                    >
+                        { `${score.toFixed(1)} / 5` }
+                    </div>
+                </div>
+                <div style={ { display: "flex", gap: 8 } }>
+                    { [0, 1, 2, 3, 4].map((index) => (
+                        <Star
+                            fill={ Math.max(0, Math.min(1, score - index)) }
+                            index={ index }
+                            key={ index }
+                        />
                     )) }
                 </div>
             </div>

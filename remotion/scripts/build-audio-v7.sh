@@ -67,8 +67,8 @@ ffmpeg -y -hide_banner -loglevel error \
 [0][n][r][v][s]amix=inputs=5:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95" \
     "$AUDIO/intro-v7.wav"
 
-# 30s film. Tighter bed so the chime ends inside the 7.2s intro beat.
-# Voice delay 1.780s. Fade ends at 5.947s. Chime at 6.120s, ends near 6.69s.
+# 30s film. Wake card starts at 2.000s. The line is ~3.96s, so it finishes
+# during the third card. Fade ends at 6.167s. Chime at 6.350s, before 7.200s.
 ffmpeg -y -hide_banner -loglevel error \
     -f lavfi -t "$DEMO30_SEC" -i anullsrc=r=48000:cl=mono \
     -i "$TMP/notify.wav" \
@@ -76,10 +76,10 @@ ffmpeg -y -hide_banner -loglevel error \
     -i "$TMP/voice.wav" \
     -i "$TMP/success.wav" \
     -filter_complex "\
-[1]adelay=280|280,volume=0.95[n];\
-[2]adelay=720|720,volume=0.78[r];\
-[3]adelay=1780|1780,volume=0.95[v];\
-[4]adelay=6120|6120,volume=0.92[s];\
+[1]adelay=240|240,volume=0.95[n];\
+[2]adelay=900|900,volume=0.78[r];\
+[3]adelay=2000|2000,volume=0.95[v];\
+[4]adelay=6350|6350,volume=0.92[s];\
 [0][n][r][v][s]amix=inputs=5:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95" \
     "$AUDIO/demo30.wav"
 

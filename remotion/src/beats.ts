@@ -57,7 +57,8 @@ export const VOICE_LINE_V7 = "Hi John, this is RentRecovery, calling for Sunset 
 const PAY_CAPTION = "Link lands by text and email. Paid before the call ends.";
 const LOCKUP_CAPTION = "Built at the Supabase hackathon.";
 const TEASER_OFFER_CAPTION = "$800.00 today, $1,600.00 on the 14th. Lawn mowed Saturday.";
-const BENEFIT_CAPTION = "John's $800.00 is collected and $1,600.00 is scheduled. $6,760.00 of the $7,560.00 book is still open.";
+const BENEFIT_CAPTION = "Past due drops. Owners get paid.";
+const DEMO30_PORTFOLIO_CAPTION = "Syncs from AppFolio into Supabase. Each landlord sees only their rows.";
 
 /** Casey replaces John late enough that her 0.82 gauge has settled when the second caption starts. */
 export const DEMO30_CASEY_ENTER_FRAME = 48;
@@ -120,10 +121,33 @@ const introBeatsV7 = introBeats(VOICE_LINE_V7, [60, 60, 90, 60, 60]);
 /** v6 open. Demo and teaser still start on this clock. */
 const introBeatsV6 = introBeats(VOICE_LINE, [60, 60, 90, 60, 60]);
 /**
- * Tightened open for the 30s film. 7.2s so the new line, its fade, and the
- * success chime all finish before the portfolio starts. Only this beat has sound.
+ * Three Demo30 cards inside 7.2s. The spoken line is about 3.96s, so the wake
+ * card starts at 2.0s and the line finishes over the start of the third card.
+ * The fade and chime still end before the portfolio at 7.2s.
  */
-const introBeats30 = introBeats(VOICE_LINE_V7, [36, 36, 72, 36, 36]);
+const introBeats30: readonly IBeat[] = [
+    {
+        id: "stakes",
+        from: 0,
+        durationInFrames: 60,
+        caption: null,
+        srt: "RENT IS LATE.\nJohn Smith\n$2,400 overdue\nSomeone has to chase it.\nNot anymore.",
+    },
+    {
+        id: "wake",
+        from: 60,
+        durationInFrames: 72,
+        caption: null,
+        srt: VOICE_LINE_V7,
+    },
+    {
+        id: "close",
+        from: 132,
+        durationInFrames: 84,
+        caption: null,
+        srt: "$2,400 OVERDUE\n$800 PAID\n$1,600 SCHEDULED\nRentRecovery\nFrom overdue to paid.",
+    },
+];
 
 function place(beats: readonly Omit<IBeat, "from">[], origin: number): IBeat[] {
     let cursor = origin;
@@ -214,8 +238,8 @@ const demo30Story = place(
         {
             id: "portfolio",
             durationInFrames: 120,
-            caption: PORTFOLIO_CAPTION,
-            srt: PORTFOLIO_CAPTION,
+            caption: DEMO30_PORTFOLIO_CAPTION,
+            srt: DEMO30_PORTFOLIO_CAPTION,
         },
         {
             id: "chain",

@@ -57,11 +57,9 @@ describe("film durations", () => {
     it("keeps the 30 second demo on a 900 frame clock", () => {
         expect(DEMO30.durationInFrames).toBe(900);
         expect(DEMO30.beats.map((beat) => beat.id)).toEqual([
-            "late",
-            "chase",
+            "stakes",
             "wake",
-            "split",
-            "brand",
+            "close",
             "portfolio",
             "chain",
             "call",
@@ -69,6 +67,10 @@ describe("film durations", () => {
             "benefit",
             "lockup",
         ]);
+        expect(beatById(DEMO30, "stakes").durationInFrames).toBe(60);
+        expect(beatById(DEMO30, "wake").durationInFrames).toBe(72);
+        expect(beatById(DEMO30, "close").durationInFrames).toBe(84);
+        expect(beatById(DEMO30, "portfolio").from).toBe(216);
         assertOrder(DEMO30.beats);
         expect(beatById(DEMO30, "call").durationInFrames - DEMO30_LINK_FRAME).toBeGreaterThanOrEqual(2 * FPS);
         expect(DEMO30.beats.some((beat) => beat.id === "pay")).toBe(false);
@@ -160,12 +162,11 @@ describe("captions", () => {
         );
         expect(beatById(TEASER, "lockup").caption).toBe("Built at the Supabase hackathon.");
         expect(beatById(DEMO30, "portfolio").caption).toBe(
-            "Portfolio syncs to Supabase. Row-level security keeps each landlord in their own rows.",
+            "Syncs from AppFolio into Supabase. Each landlord sees only their rows.",
         );
         expect(beatById(DEMO30, "chain").caption).toBe("The overdue invoice starts the call on its own.");
-        expect(beatById(DEMO30, "benefit").caption).toBe(
-            "John's $800.00 is collected and $1,600.00 is scheduled. $6,760.00 of the $7,560.00 book is still open.",
-        );
+        expect(beatById(DEMO30, "benefit").caption).toBe("Past due drops. Owners get paid.");
+        expect(beatById(DEMO30, "benefit").caption?.split(/\s+/).length).toBeLessThanOrEqual(8);
         expect(beatById(DEMO30, "lockup").caption).toBe("Built at the Supabase hackathon.");
         expect(beatById(DEMO30, "hardship").cues).toEqual([
             { from: 0, text: "Every turn gets a hardship check." },
@@ -187,6 +188,16 @@ describe("captions", () => {
                     }
                 } else if (beat.caption) {
                     expect(beat.durationInFrames).toBeGreaterThanOrEqual(2 * FPS);
+                }
+            }
+        }
+        for (const beat of DEMO30.beats) {
+            expect(beat.durationInFrames).toBeGreaterThanOrEqual(2 * FPS);
+            if (beat.cues) {
+                for (let index = 0; index < beat.cues.length; index += 1) {
+                    const start = beat.cues[index]?.from ?? 0;
+                    const end = beat.cues[index + 1]?.from ?? beat.durationInFrames;
+                    expect(end - start).toBeGreaterThanOrEqual(2 * FPS);
                 }
             }
         }

@@ -15,7 +15,11 @@ import {
     DEMO30_TURNS,
     dollars,
     OPEN_DOLLARS,
+    PAST_DUE_END,
     PORTFOLIO_COUNTS,
+    ROI_LINE,
+    SATISFACTION_FROM,
+    SATISFACTION_TO,
     SCHEDULED_DOLLARS,
     SOURCE_NAME,
     SYNC_HEADLINE,
@@ -37,6 +41,10 @@ describe("demo30 story numbers", () => {
         expect(OPEN_DOLLARS).toBe(6760);
         expect(ARRANGED_DOLLARS).toBe(2400);
         expect(UNTOUCHED_DOLLARS).toBe(5160);
+        expect(PAST_DUE_END).toBe(5160);
+        expect(ROI_LINE).toBe("$2,400 arranged · 1 call · 0 staff hours");
+        expect(SATISFACTION_FROM).toBe(3.8);
+        expect(SATISFACTION_TO).toBe(4.6);
         expect(dollars(BOOK_DOLLARS)).toBe("$7,560.00");
         expect(bookPercent(COLLECTED_DOLLARS)).toBe("10.6%");
         expect(bookPercent(SCHEDULED_DOLLARS)).toBe("21.2%");
@@ -45,11 +53,11 @@ describe("demo30 story numbers", () => {
 
     it("counts a four-tenant book and names AppFolio as text", () => {
         expect(PORTFOLIO_COUNTS).toEqual([
-            ["Properties", 4],
-            ["Units", 4],
-            ["Leases", 4],
-            ["Tenants", 4],
-            ["Work Orders", 1],
+            ["Properties", 18],
+            ["Units", 63],
+            ["Leases", 61],
+            ["Tenants", 72],
+            ["Work Orders", 14],
         ]);
         expect(SYNC_HEADLINE).toBe("Syncing from your property management software");
         expect(SOURCE_NAME).toBe("AppFolio");
