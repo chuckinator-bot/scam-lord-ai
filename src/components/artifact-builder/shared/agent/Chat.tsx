@@ -4,7 +4,7 @@
  * Questionnaire gate footer, with attachments and submit/stop.
  * Upgrade banner: shown for Free users always; for subscribed Pro only when LLM credits are 0 (CTA to Pro+); hidden for Pro+.
  * Mobile dismiss hides the banner until remaining credits hit 0.
- * Depends on: prompt-input, attachments, suggestion, UpgradeBanner, useMyFeatureLimits. Used by: Agent.
+ * Depends on: prompt-input, attachments, suggestion. Used by: Agent.
  */
 /* eslint-disable @next/next/no-img-element */
 import {
@@ -38,10 +38,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { UpgradeBanner } from "@/components/ui/upgrade-banner";
-import { useMyFeatureLimits } from "@/api/hooks";
-import { withRenewsOn } from "@/lib/format-usage-reset-date";
-import { useUserContext } from "@/contexts/UserContext";
 import { quickTriggerSuggestionChips } from "@/assets/constants/suggestions";
 import type { FileUIPart } from "ai";
 import { memo, useCallback, forwardRef, useMemo } from "react";
@@ -214,13 +210,13 @@ const ChatInputBody = ({
                 <button
                   type="button"
                   onClick={handlePaperclipClick}
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-black dark:bg-black dark:text-white hover:bg-white/90"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground hover:bg-accent"
                   aria-label="Attach files"
                 >
                   <Paperclip className="size-4" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent className="bg-lightSecondary text-white">
+              <TooltipContent>
                 Attach files
               </TooltipContent>
             </Tooltip>
@@ -233,7 +229,7 @@ const ChatInputBody = ({
                     variant="ghost"
                     size="icon"
                     className={cn(
-                      "size-9 rounded-full bg-white text-black dark:bg-black dark:text-white hover:bg-white/90 hover:text-white [&_svg]:text-black dark:[&_svg]:text-white disabled:opacity-60",
+                      "size-9 rounded-full bg-secondary text-foreground hover:bg-accent disabled:opacity-60",
                       micStatus === "recording" && "bg-red-500 dark:bg-red-500 [&_svg]:text-white dark:[&_svg]:text-white hover:bg-red-600",
                     )}
                     disabled={micDisabled}
@@ -245,7 +241,7 @@ const ChatInputBody = ({
                   </Button>
                 </span>
               </TooltipTrigger>
-              <TooltipContent className="bg-lightSecondary text-white">
+              <TooltipContent>
                 {micTooltip}
               </TooltipContent>
             </Tooltip>
@@ -253,7 +249,7 @@ const ChatInputBody = ({
               status={isLoading ? "streaming" : "ready"}
               onStop={handleStop}
               disabled={outOfCredits}
-              className="size-9 rounded-full bg-lightSecondary [&_svg]:text-white"
+              className="size-9 rounded-full bg-primary text-primary-foreground [&_svg]:text-primary-foreground"
             />
           </div>
         </PromptInputFooter>
@@ -276,14 +272,6 @@ export const Chat = forwardRef<HTMLDivElement, IProps>((props, ref) => {
     onQuestionsSkip,
     onQuestionsDismiss,
   } = props;
-  const { user } = useUserContext();
-  const { data: featureLimits } = useMyFeatureLimits(user);
-  const outOfCredits = featureLimits != null && featureLimits.remaining_llm_requests === 0;
-  const isProOnlyTier =
-    featureLimits?.has_active_subscription === true && featureLimits.tier === "Pro";
-  const showUpgradeBanner =
-    featureLimits != null &&
-    (!featureLimits.has_active_subscription || (isProOnlyTier && outOfCredits));
   const showQuestions =
     questionsPayload != null && (questionsPayload.questions?.length ?? 0) > 0;
 
@@ -314,26 +302,10 @@ export const Chat = forwardRef<HTMLDivElement, IProps>((props, ref) => {
             ))}
           </Suggestions>
         ) : null}
-        {showUpgradeBanner ? (
-          <UpgradeBanner
-            remainingRequests={featureLimits.remaining_llm_requests}
-            totalRequests={featureLimits.max_monthly_llm_requests}
-            user={user}
-            upgradeButtonLabel={
-              isProOnlyTier && outOfCredits ? "Upgrade to Pro+" : undefined
-            }
-            exhaustedMessage={
-              outOfCredits
-                ? withRenewsOn("You have run out of credits.", featureLimits.resets_on)
-                : undefined
-            }
-            enableMobileDismiss
-          />
-        ) : null}
       </div>
       <div className="flex w-full">
         {showQuestions ? (
-          <div className="min-w-0 flex-1 sm:bg-white bg-extraLightGray dark:bg-darkGray relative z-10 p-0 rounded-md max-sm:pt-0 shadow-2xs overflow-hidden">
+          <div className="min-w-0 flex-1 bg-card relative z-10 p-0 rounded-lg max-sm:pt-0 overflow-hidden">
             <Questions
               className="w-full min-w-full"
               questions={questionsPayload.questions}
@@ -350,11 +322,11 @@ export const Chat = forwardRef<HTMLDivElement, IProps>((props, ref) => {
           <PromptInputProvider>
             <PromptInput
               onSubmit={({ text, files }) => submitAndDismissKeyboard(text, files)}
-              className="min-w-0 flex-1 sm:bg-white bg-extraLightGray dark:bg-darkGray relative z-10 rounded-3xl p-0 pt-1 max-sm:pt-0 shadow-2xs"
+              className="min-w-0 flex-1 bg-card relative z-10 rounded-lg p-0 pt-1 max-sm:pt-0"
             >
               <ChatInputBody
                 isLoading={isLoading}
-                outOfCredits={outOfCredits}
+                outOfCredits={false}
                 handleStop={handleStop}
               />
             </PromptInput>

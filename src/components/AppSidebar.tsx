@@ -11,7 +11,6 @@
 import {
     LogOut,
     Receipt,
-    Crown,
     Trash2,
     Settings,
     Sun,
@@ -45,9 +44,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUserContext } from "@/contexts/UserContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useMyFeatureLimits, useUserFullName, useChatIds } from "@/api/hooks";
+import { useUserFullName, useChatIds } from "@/api/hooks";
 import { signOutUser } from "@/api/authentication";
-import { TestUserTierToggle } from "@/components/TestUserTierToggle";
 import { TestUserDebugModeToggle } from "@/components/TestUserDebugModeToggle";
 import { isTestUser } from "@/api/feature-limits";
 import { cn } from "@/lib/utils";
@@ -65,6 +63,7 @@ import { BUILDER_DRAFT_KEY, clearBuilderDraft } from "@/lib/builder-draft";
 import { deleteChatHistory, setChatPinned, updateChatTitle } from "@/api/chat-history";
 import { buildAuthLoginHref } from "@/lib/sign-in-return";
 import { buildDashboardHref } from "@/lib/dashboard-url";
+import { Logo } from "@/components/Logo";
 
 const CHAT_MESSAGES_KEY = "messages";
 
@@ -86,8 +85,6 @@ export function AppSidebar() {
     const { user, isLoading } = useUserContext();
     const { theme, setTheme } = useTheme();
     const { data: userFullName } = useUserFullName(user?.id ? user.id : undefined);
-    const { data: featureLimits } = useMyFeatureLimits(user);
-    const isPro = featureLimits?.has_active_subscription === true;
     const stripePortalUrl = process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL?.trim() || "";
 
     const [openDeleteAccountDialog, setOpenDeleteAccountDialog] = useState(false);
@@ -148,7 +145,9 @@ export function AppSidebar() {
     const searchParams = useSearchParams();
     const loginHref = buildAuthLoginHref(pathname, searchParams);
     const selectedChatId =
-        pathname?.startsWith("/dashboard") === true ? searchParams.get("chat") : null;
+        pathname?.startsWith("/dashboard") === true
+            ? searchParams.get("chat")
+            : null;
 
     const handleLogout = async () => {
         await signOutUser();
@@ -334,9 +333,11 @@ export function AppSidebar() {
                                 tooltip="Toggle sidebar"
                             >
                                 <PanelLeft className="shrink-0" />
-                                <span className="font-tertiary text-base font-bold tracking-tight text-foreground">
-                                    ScamLord
-                                </span>
+                                <Logo
+                                    size="nav"
+                                    showMark={false}
+                                    wordmarkClassName="group-data-[collapsible=icon]:hidden"
+                                />
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
@@ -400,7 +401,6 @@ export function AppSidebar() {
                             <SidebarSeparator />
                             <SidebarGroup>
                                 <SidebarGroupContent>
-                                    <TestUserTierToggle />
                                     <TestUserDebugModeToggle />
                                 </SidebarGroupContent>
                             </SidebarGroup>
@@ -474,20 +474,16 @@ export function AppSidebar() {
                                             Units
                                         </DropdownMenuLabel>
                                        
-                                        {user && isPro && stripePortalUrl && (
+                                        {user && stripePortalUrl && (
                                             <>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuLabel className="text-xs text-muted-foreground font-normal flex items-center gap-1.5">
-                                                    <Crown className="h-4 w-4" />
-                                                    Pro account
-                                                </DropdownMenuLabel>
                                                 <DropdownMenuItem asChild>
                                                     <a
                                                         href={stripePortalUrl}
                                                         className="cursor-pointer flex items-center gap-2"
                                                     >
                                                         <Receipt className="h-4 w-4" />
-                                                        Manage Subscription
+                                                        Manage billing
                                                     </a>
                                                 </DropdownMenuItem>
                                             </>
@@ -566,7 +562,7 @@ export function AppSidebar() {
                 confirmLabel="Save"
                 confirmLoadingLabel="Saving…"
                 confirmVariant="default"
-                confirmClassName="bg-lightSecondary text-white hover:bg-lightSecondary/90"
+                confirmClassName=""
                 isConfirmLoading={isRenaming}
                 closeOnConfirm={false}
                 confirmDisabled={!renameDraft?.title.trim()}
