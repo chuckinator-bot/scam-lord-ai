@@ -1,33 +1,24 @@
 /**
  * @module chat/tools
  *
- * The Agent manager reads the floor JSON. It does not start or change an agent (ADR 0002 / 03).
- * Depends on: ai, zod, agent-floor/agents.
+ * The Agent manager reads stored calls. It does not start or change an agent.
+ * Depends on: ai, zod, load-calls.
  * Used by: /api/chat/route.ts
  */
 
 import { tool } from "ai";
 import { z } from "zod";
-import { DEFAULT_AGENTS } from "@/lib/agent-floor/agents";
+import { loadCalls } from "@/lib/landlord-home/load-calls";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-/**
- * Tool registry for the Agent manager.
- * The chat route still passes the artifact document. This tool ignores it.
- *
- * @param _props - Ignored. Kept so `route.ts` can keep its current call.
- * @returns The readAgents tool.
- */
-export function getTools(_props?: { artifactDocument?: TChatArtifactDocument }) {
-    void _props;
-
+export function getTools(supabase: SupabaseClient) {
     return {
         readAgents: tool({
-            description: "Read the agents on the floor: status, current step, tenant, property, trace, invoice, schedule, outcomes, policy, and perks.",
+            description: "Read the agents on the floor: status, current step, tenant, property, trace, invoice, schedule, outcomes, policy, and perks. Empty when this landlord has no calls.",
             inputSchema: z.object({}),
-            execute: async () => DEFAULT_AGENTS,
+            execute: async () => loadCalls(supabase),
         }),
     };
 }
 
-/** Inferred from `getTools` so the chat route stays typed. */
 export type TChatTools = ReturnType<typeof getTools>;

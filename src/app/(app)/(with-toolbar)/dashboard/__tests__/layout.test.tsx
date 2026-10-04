@@ -7,12 +7,12 @@ vi.mock("@/app/(app)/(with-toolbar)/dashboard/Dashboard", () => ({ Dashboard: ()
 vi.mock("@/components/artifact-builder/shared/DashboardSkeletonSSR", () => ({
     DashboardSkeletonSSR: () => null,
 }));
-vi.mock("next/navigation", () => ({ usePathname: () => "/dashboard" }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 vi.mock("@/components/CustomSidebarTrigger", () => ({ CustomTrigger: () => null }));
 
-import ArtifactBuilderLayout from "@/app/(app)/(with-toolbar)/dashboard/layout";
+import ArtifactBuilderLayout from "@/app/(app)/(with-toolbar)/layout";
 
-describe("dashboard layout.tsx", () => {
+describe("(with-toolbar) layout.tsx", () => {
     afterEach(() => {
         cleanup();
     });
@@ -30,10 +30,10 @@ describe("dashboard layout.tsx", () => {
         expect(className).toContain("flex");
     });
 
-    it("keeps title and actions portal targets", () => {
+    it("keeps centered nav and actions portal targets", () => {
         render(<ArtifactBuilderLayout>{null}</ArtifactBuilderLayout>);
 
-        expect(document.getElementById("toolbar-program-title-portal")).toBeTruthy();
+        expect(document.getElementById("toolbar-nav-portal")).toBeTruthy();
         expect(document.getElementById("toolbar-actions-portal")).toBeTruthy();
     });
 });

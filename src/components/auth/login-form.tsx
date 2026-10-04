@@ -2,13 +2,12 @@
 
 /**
  * @module login-form
- * Login card: Apple/Google OAuth buttons, email/password form with validation. On submit shows
- * Turnstile then TurnstileSignIn; supports redirect path and forgot-password link.
- * Depends on: TurnstileSignIn, Supabase client, UI components, react-hook-form/yup.
+ * Login card: email/password form with validation.
+ * Supports redirect path and forgot-password link.
+ * Depends on: Supabase client, UI components, react-hook-form/yup.
  * Used by: auth login page.
  */
 import { cn } from '@/lib/utils'
-import { createClient } from '@/utils/supabase/client'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -20,63 +19,28 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Separator } from '../ui/separator'
-import { Provider } from '@supabase/supabase-js'
-import { TurnstileSignIn } from './TurnstileSignIn'
+import { AuthError } from '@supabase/supabase-js'
+import { DASHBOARD_PATH } from '@/lib/dashboard-url'
 import { buildAuthSignUpHrefFromNext, sanitizeSignInReturn } from '@/lib/sign-in-return'
+import { handleSignInViaEmail } from '@/lib/auth/form-handlers'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from 'react-hook-form'
 
-/** Props: div props plus redirectPath (where to send user after successful login; default '/'). */
+/** Props: div props plus redirectPath (where to send user after successful login; default dashboard). */
 type TLoginFormProps = React.ComponentPropsWithoutRef<'div'> & {
   redirectPath?: string;
 };
 
-/** Renders login card with OAuth, email/password form, and Turnstile-gated sign-in. */
-export function LoginForm({ className, redirectPath = '/', ...props }: TLoginFormProps) {
+/** Renders login card with email/password form. */
+export function LoginForm({ className, redirectPath = DASHBOARD_PATH, ...props }: TLoginFormProps) {
     const safeRedirectPath = sanitizeSignInReturn(redirectPath);
+    const router = useRouter();
 
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [googleIsLoading,setGoogleIsLoading] = useState(false);
-    const [appleIsLoading, setAppleIsLoading] = useState(false);
-    const [turnstileOpen, setTurnstileOpen] = useState(false);
-
-    const handleIsLoading = (isLoading: boolean) => {
-        setIsLoading(isLoading);
-    }
-
-    const handleTurnstileOpen = (turnstileOpen: boolean) => {
-        setTurnstileOpen(turnstileOpen);
-    }
-
-    const handleSocialLogin = async (e: React.FormEvent, provider: Provider) => {
-        e.preventDefault()
-        const supabase = createClient()
-        if (provider === "apple") {
-            setAppleIsLoading(true);
-            setError(null);
-        } else if (provider === "google") {
-            setGoogleIsLoading(true);
-            setError(null);
-        }
-
-        try {
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: provider,
-                options: {
-                redirectTo: `https://proximafitness.com/auth/oauth?next=${encodeURIComponent(safeRedirectPath)}`,
-                },
-            })
-
-            if (error) throw error
-        } catch (error: unknown) {
-            setError(error instanceof Error ? error.message : 'An error occurred')
-            setGoogleIsLoading(false);
-            setAppleIsLoading(false);
-        }
-    }
 
     const schema = Yup.object({
         email: Yup.string()
@@ -106,46 +70,31 @@ export function LoginForm({ className, redirectPath = '/', ...props }: TLoginFor
     const { onChange: onEmailChange } = register("email");
     const { onChange: onPasswordChange } = register("password");
 
-    const handleLogin = () => {
-        handleIsLoading(true)
-        handleTurnstileOpen(true);
-    }
-
-    const handleTurnstileClose = () => {
-        handleTurnstileOpen(false);
-        handleIsLoading(false);
-    }
-
-    const handleSignInError = () => {
-        setValue('password', '');
+    const handleLogin = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const status = await handleSignInViaEmail(watchEmail, watchPassword);
+            if (status instanceof AuthError) {
+                setValue('password', '');
+                toast.error("Error signing in: " + status.message);
+                return;
+            }
+            if (status) {
+                router.push(safeRedirectPath);
+            }
+        } finally {
+            setIsLoading(false);
+        }
     }
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <Card className='bg-lightGray dark:bg-extraDarkGray dark:text-white'>
+      <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
         </CardHeader>
         <CardContent>
-            <div className='flex flex-col gap-4'>
-            <form onSubmit={ (e) => handleSocialLogin(e, "apple")}>
-                <div className="flex flex-col gap-6">
-                    {error && <p className="text-sm text-destructive-500">{error}</p>}
-                    <Button variant='outline' type="submit" className="w-full" disabled={isLoading}>
-                        {appleIsLoading ? 'Logging in...' : 'Continue with Apple'}
-                    </Button>
-                </div>
-           </form>
-            <form onSubmit={ (e) => handleSocialLogin(e, "google")}>
-                <div className="flex flex-col gap-6">
-                    {error && <p className="text-sm text-destructive-500">{error}</p>}
-                    <Button variant="outline" type="submit" className="w-full" disabled={isLoading}>
-                        {googleIsLoading ? 'Logging in...' : 'Continue with Google'}
-                    </Button>
-                </div>
-           </form>
-            </div>
-           <Separator className=' my-4' />
           <form onSubmit={ handleSubmit(handleLogin) } id={ "sign-in-form"  }>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
@@ -153,7 +102,7 @@ export function LoginForm({ className, redirectPath = '/', ...props }: TLoginFor
                 <Input
                     id="email"
                     type="email"
-                    placeholder="lifter@proximafitness.com"
+                    placeholder="you@example.com"
                     required
                     value={ watchEmail }
                     onInput={ (e) => {
@@ -194,7 +143,7 @@ export function LoginForm({ className, redirectPath = '/', ...props }: TLoginFor
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full bg-lightSecondary text-white" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
             </div>
@@ -205,15 +154,6 @@ export function LoginForm({ className, redirectPath = '/', ...props }: TLoginFor
               </Link>
             </div>
           </form>
-        { turnstileOpen &&
-            <TurnstileSignIn
-                email={ watch().email }
-                password={ watch().password }
-                handleTurnstileClose={ handleTurnstileClose }
-                onSignInError={ handleSignInError }
-                redirectPath={ safeRedirectPath }
-            />
-        }
         </CardContent>
       </Card>
     </div>

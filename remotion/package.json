@@ -1,0 +1,28 @@
+{
+    "name": "rentrecovery-videos",
+    "private": true,
+    "type": "module",
+    "version": "1.0.0",
+    "description": "Animated RentRecovery films for the Supabase hackathon.",
+    "scripts": {
+        "test": "vitest run",
+        "audio": "bash scripts/build-audio.sh",
+        "studio": "remotion studio src/index.ts",
+        "render:demo": "remotion render src/index.ts RentRecoveryDemo",
+        "render:intro": "remotion render src/index.ts RentRecoveryIntro",
+        "render:teaser": "remotion render src/index.ts RentRecoveryTeaser"
+    },
+    "dependencies": {
+        "@remotion/cli": "4.0.532",
+        "@remotion/google-fonts": "4.0.532",
+        "react": "19.0.0",
+        "react-dom": "19.0.0",
+        "remotion": "4.0.532"
+    },
+    "devDependencies": {
+        "@types/react": "19.0.0",
+        "@types/react-dom": "19.0.0",
+        "typescript": "5.8.3",
+        "vitest": "3.2.4"
+    }
+}

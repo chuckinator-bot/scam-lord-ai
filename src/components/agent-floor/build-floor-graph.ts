@@ -27,7 +27,10 @@ const STEP_LABEL: Record<TAgentStep, string> = {
 
 export interface IFloorNodeData extends Record<string, unknown> {
     label: string;
+    tenant: string;
     current: boolean;
+    /** Payment landed on this step. */
+    success: boolean;
 }
 
 /**
@@ -46,16 +49,13 @@ export function buildFloorGraph(agents: readonly IAgent[]): {
             const current = agent.currentStep === step;
             nodes.push({
                 id: `${agent.id}:${step}`,
+                type: "step",
                 position: { x: stepIndex * 200, y: agentIndex * 220 },
                 data: {
-                    label: `${agent.tenant} · ${STEP_LABEL[step]}`,
+                    label: STEP_LABEL[step],
+                    tenant: agent.tenant,
                     current,
-                },
-                style: {
-                    color: "#111111",
-                    background: "#ffffff",
-                    border: current ? "2px solid #33bbcf" : "1px solid #e5e5e5",
-                    fontWeight: current ? 700 : 400,
+                    success: step === "paid" && (agent.status === "paid" || agent.currentStep === "paid"),
                 },
             });
         });
@@ -65,6 +65,12 @@ export function buildFloorGraph(agents: readonly IAgent[]): {
                 id: `${agent.id}:${source}:${target}`,
                 source: `${agent.id}:${source}`,
                 target: `${agent.id}:${target}`,
+                type: "straight",
+                markerEnd: {
+                    type: "arrowclosed",
+                    width: 16,
+                    height: 16,
+                },
             });
         }
     });

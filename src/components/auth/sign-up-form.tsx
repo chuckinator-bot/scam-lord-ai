@@ -4,8 +4,7 @@
 /**
  * @module sign-up-form
  * Registration form: email, password, confirm password, username, first/last name with Yup validation.
- * On submit shows Turnstile then TurnstileSignUp to complete registration.
- * Depends on: TurnstileSignUp, UI components, react-hook-form/yup.
+ * Depends on: UI components, react-hook-form/yup, auth helpers.
  * Used by: auth sign-up page.
  */
 import { cn } from '@/lib/utils';
@@ -24,18 +23,19 @@ import { useState } from 'react';
 import * as Yup from "yup";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
-import { TurnstileSignUp } from './TurnstileSignUp';
+import { DASHBOARD_PATH } from '@/lib/dashboard-url';
 import { buildAuthLoginHrefFromNext } from '@/lib/sign-in-return';
+import { handleSignUpViaEmail } from '@/lib/auth/form-handlers';
+import { useRouter } from 'next/navigation';
 
 /** Props: div props plus optional redirectPath preserved for login link (Sign-in return). */
 type TSignUpFormProps = React.ComponentPropsWithoutRef<'div'> & {
   redirectPath?: string;
 };
 
-export function SignUpForm({ className, redirectPath = '/', ...props }: TSignUpFormProps) {
-
+export function SignUpForm({ className, redirectPath = DASHBOARD_PATH, ...props }: TSignUpFormProps) {
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false)
-    const [turnstileOpen, setTurnstileOpen] = useState(false);
 
     const schema = Yup.object({
         email: Yup.string()
@@ -98,14 +98,26 @@ export function SignUpForm({ className, redirectPath = '/', ...props }: TSignUpF
     const { onChange: onFirstNameChange } = register("firstName");
     const { onChange: onLastNameChange } = register("lastName");
 
-    const handleSignUp = () => {
+    const handleSignUp = async () => {
         setIsLoading(true);
-        setTurnstileOpen(true);
+        try {
+            await handleSignUpViaEmail(
+                watchEmail,
+                watchPassword,
+                watchConfirmPassword,
+                watchUserName,
+                watchFirstName,
+                watchLastName,
+                router,
+            );
+        } finally {
+            setIsLoading(false);
+        }
     };
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <Card className='bg-lightGray dark:bg-extraDarkGray dark:text-white'>
+      <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Sign up</CardTitle>
           <CardDescription>Create a new account</CardDescription>
@@ -120,7 +132,7 @@ export function SignUpForm({ className, redirectPath = '/', ...props }: TSignUpF
                     type="email"
                     name="email"
                     autoComplete="email"
-                    placeholder="lifter@proximafitness.com…"
+                    placeholder="you@example.com"
                     required
                     value={ watchEmail }
                     onInput={ (e) => {
@@ -246,7 +258,7 @@ export function SignUpForm({ className, redirectPath = '/', ...props }: TSignUpF
               </div>
               <Button
                 type="submit"
-                className="w-full bg-lightSecondary text-white"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? 'Creating an account…' : 'Sign up'}
@@ -259,16 +271,6 @@ export function SignUpForm({ className, redirectPath = '/', ...props }: TSignUpF
               </Link>
             </div>
           </form>
-            { turnstileOpen &&
-                <TurnstileSignUp
-                    email={ watch().email }
-                    password={ watch().password }
-                    confirmPassword={ watch().confirmPassword }
-                    userName={ watch().username }
-                    firstName={ watch().firstName }
-                    lastName={ watch().lastName }
-                />
-            }
         </CardContent>
       </Card>
     </div>
