@@ -143,7 +143,7 @@ describe("narration", () => {
 });
 
 describe("home seed figures", () => {
-    it("uses the portfolio sums and leaves time to first call blank", () => {
+    it("keeps the seed sums and shows John Smith's plan", () => {
         expect(RECOVERED_DOLLARS).toBe(10_660);
         expect(STILL_OVERDUE_DOLLARS).toBe(13_740);
         expect(PROMISED_DOLLARS).toBe(9_110);
@@ -151,15 +151,20 @@ describe("home seed figures", () => {
             "$10,660.00",
             "$13,740.00",
             "$9,110.00",
-            "—",
+            "4 min",
         ]);
         expect(NEEDS_YOU.map((row) => row.tenant)).toEqual([
+            "John Smith",
             "Drew Okonkwo",
             "Finley Grant",
             "Quinn Alvarez",
         ]);
-        expect(OPEN_CALL.tenant).toBe("Casey Nguyen");
-        expect(OPEN_CALL.line).toBe("I got hit with a short week at work. I can catch up.");
-        expect(OPEN_CALL.step).toBe("Jev check");
+        expect(NEEDS_YOU[0]?.reason).toBe("$2,400 overdue");
+        expect(OPEN_CALL.tenant).toBe("John Smith");
+        expect(OPEN_CALL.lines.map((line) => line.text)).toEqual([
+            "$2,400 overdue",
+            "$1,200 received",
+            "$1,200 by the 18th",
+        ]);
     });
 });

@@ -16,6 +16,7 @@ import { theme } from "../theme";
 import { ASSET_FLAGS } from "./asset-flags";
 import { localFrameAtPhrase } from "./captions";
 import {
+    DEMO_DATA_TAG,
     HOME_TILES,
     NEEDS_YOU,
     NEEDS_YOU_HEADING,
@@ -91,9 +92,9 @@ function Paper({ children, tall = false }: { children: ReactNode; tall?: boolean
                 border: `3px solid ${theme.ink}`,
                 borderRadius: 6,
                 boxShadow: "8px 10px 0 rgba(16, 36, 27, 0.12)",
-                height: tall ? 390 : 360,
-                padding: 22,
-                width: 280,
+                height: tall ? 600 : 560,
+                padding: 28,
+                width: 400,
             } }
         >
             { children }
@@ -125,10 +126,10 @@ function LateFeeLetter() {
                     border: `4px solid ${theme.overdueInk}`,
                     color: theme.overdueInk,
                     fontFamily: fontDisplay,
-                    fontSize: 28,
+                    fontSize: 40,
                     letterSpacing: 1,
-                    marginTop: 48,
-                    padding: "12px 8px",
+                    marginTop: 64,
+                    padding: "16px 10px",
                     textAlign: "center",
                     transform: "rotate(-8deg)",
                 } }
@@ -143,40 +144,40 @@ function DoorNotice() {
     return (
         <div
             style={ {
-                background: "#8C5A3C",
+                background: theme.ink,
                 borderRadius: 10,
-                height: 400,
+                height: 620,
                 position: "relative",
-                width: 230,
+                width: 340,
             } }
         >
             <div
                 style={ {
-                    background: "#E7D7A1",
-                    border: `2px solid ${theme.ink}`,
+                    background: theme.mint,
+                    border: `3px solid ${theme.mint}`,
                     color: theme.ink,
                     fontFamily: fontDisplay,
-                    fontSize: 22,
-                    left: 36,
-                    padding: "16px 12px",
+                    fontSize: 32,
+                    left: 42,
+                    padding: "18px 14px",
                     position: "absolute",
                     textAlign: "center",
-                    top: 36,
+                    top: 48,
                     transform: "rotate(3deg)",
-                    width: 150,
+                    width: 190,
                 } }
             >
                 NOTICE
             </div>
             <div
                 style={ {
-                    background: "#D7B07A",
+                    background: theme.mint,
                     borderRadius: 28,
-                    height: 56,
+                    height: 72,
                     position: "absolute",
-                    right: 22,
-                    top: 176,
-                    width: 28,
+                    right: 28,
+                    top: 230,
+                    width: 36,
                 } }
             />
         </div>
@@ -200,8 +201,8 @@ function CourtForm() {
             <div
                 style={ {
                     fontFamily: fontDisplay,
-                    fontSize: 32,
-                    margin: "6px 0 18px",
+                    fontSize: 44,
+                    margin: "8px 0 22px",
                 } }
             >
                 SUMMONS
@@ -236,7 +237,7 @@ function Illustration({
                 gap: 16,
                 opacity: shown ? fadeIn(local) : 0,
                 transform: `translateY(${shown ? interpolate(local, [0, 12], [20, 0], { extrapolateRight: "clamp" }) : 20}px)`,
-                width: 320,
+                width: 460,
             } }
         >
             { children }
@@ -244,8 +245,8 @@ function Illustration({
                 style={ {
                     color: theme.inkSoft,
                     fontFamily: fontSans,
-                    fontSize: 18,
-                    fontWeight: 600,
+                    fontSize: 28,
+                    fontWeight: 700,
                 } }
             >
                 { label }
@@ -267,10 +268,10 @@ function Callout({ at, text }: { at: number; text: string }) {
                 borderRadius: theme.radiusPill,
                 color: theme.mint,
                 fontFamily: fontSans,
-                fontSize: 28,
+                fontSize: 36,
                 fontWeight: 700,
                 opacity: fadeIn(local),
-                padding: "14px 22px",
+                padding: "18px 28px",
             } }
         >
             { text }
@@ -287,14 +288,18 @@ function OldWayScene() {
         <AbsoluteFill
             style={ {
                 background: theme.bg,
+                display: "flex",
+                flexDirection: "column",
                 fontFamily: fontSans,
-                padding: `72px 80px ${BOTTOM_SAFE}px`,
+                justifyContent: "space-between",
+                padding: `36px 48px ${BOTTOM_SAFE}px`,
             } }
         >
             <div
                 style={ {
-                    alignItems: "flex-end",
+                    alignItems: "center",
                     display: "flex",
+                    flex: 1,
                     justifyContent: "space-between",
                 } }
             >
@@ -351,14 +356,23 @@ function RingScene() {
                     background: theme.mintWash,
                     color: theme.ink,
                     fontFamily: fontDisplay,
-                    fontSize: 72,
+                    fontSize: 104,
                     justifyContent: "center",
-                    lineHeight: 1.08,
-                    padding: 140,
+                    lineHeight: 1.05,
+                    padding: "80px 100px 160px",
                     textAlign: "center",
                 } }
             >
-                <div style={ { maxWidth: 1400, opacity } }>
+                <div
+                    style={ {
+                        background: theme.white,
+                        borderRadius: 36,
+                        maxWidth: 1680,
+                        opacity,
+                        padding: "72px 80px",
+                        width: "100%",
+                    } }
+                >
                     A conversation the day rent goes late.
                 </div>
             </AbsoluteFill>
@@ -376,7 +390,7 @@ function RingScene() {
         >
             <Phone
                 shake
-                width={ 460 }
+                width={ 480 }
             >
                 <div
                     style={ {
@@ -393,9 +407,9 @@ function RingScene() {
                         style={ {
                             color: theme.inkSoft,
                             fontFamily: fontSans,
-                            fontSize: 22,
+                            fontSize: 28,
                             fontWeight: 700,
-                            letterSpacing: 1.2,
+                            letterSpacing: 1.4,
                         } }
                     >
                         INCOMING
@@ -403,7 +417,7 @@ function RingScene() {
                     <div
                         style={ {
                             fontFamily: fontDisplay,
-                            fontSize: 64,
+                            fontSize: 92,
                         } }
                     >
                         { showMia ? "Mia" : "…" }
@@ -413,13 +427,16 @@ function RingScene() {
                             style={ {
                                 color: theme.inkSoft,
                                 fontFamily: fontSans,
-                                fontSize: 28,
+                                fontSize: 36,
                             } }
                         >
                             an AI voice agent
                         </div>
                     ) : null }
-                    <Waveform height={ 72 } />
+                    <Waveform
+                        bars={ 28 }
+                        height={ 96 }
+                    />
                 </div>
             </Phone>
         </AbsoluteFill>
@@ -442,10 +459,10 @@ function LivePlaceholder() {
                 alignItems: "center",
                 display: "flex",
                 flexDirection: "column",
-                gap: 16,
+                gap: 28,
                 height: "100%",
                 justifyContent: "center",
-                padding: 12,
+                padding: 18,
                 textAlign: "center",
             } }
         >
@@ -453,9 +470,9 @@ function LivePlaceholder() {
                 style={ {
                     color: theme.violet,
                     fontFamily: fontSans,
-                    fontSize: 18,
+                    fontSize: 26,
                     fontWeight: 800,
-                    letterSpacing: 1.2,
+                    letterSpacing: 1.4,
                 } }
             >
                 { LIVE_CALL_SLATE }
@@ -463,7 +480,7 @@ function LivePlaceholder() {
             <div
                 style={ {
                     fontFamily: fontDisplay,
-                    fontSize: 36,
+                    fontSize: 52,
                     lineHeight: 1.1,
                 } }
             >
@@ -473,7 +490,7 @@ function LivePlaceholder() {
                 style={ {
                     color: theme.inkSoft,
                     fontFamily: fontSans,
-                    fontSize: 28,
+                    fontSize: 44,
                     fontVariantNumeric: "tabular-nums",
                     fontWeight: 700,
                 } }
@@ -486,21 +503,24 @@ function LivePlaceholder() {
 
 function StepRail({ activeIndex }: { activeIndex: number }) {
     return (
-        <div style={ { display: "flex", flexDirection: "column", gap: 10 } }>
+        <div style={ { display: "flex", flex: 1, flexDirection: "column", gap: 14 } }>
             { MAIN_PATH.map((step, index) => {
                 const current = index === activeIndex;
                 return (
                     <div
                         key={ step }
                         style={ {
+                            alignItems: "center",
                             background: theme.white,
-                            border: current ? `2px solid ${theme.violet}` : `1px solid ${theme.border}`,
-                            borderRadius: 12,
+                            border: current ? `3px solid ${theme.violet}` : `1px solid ${theme.border}`,
+                            borderRadius: 16,
                             color: index <= activeIndex ? theme.ink : theme.mutedInk,
+                            display: "flex",
+                            flex: 1,
                             fontFamily: fontSans,
-                            fontSize: 22,
+                            fontSize: 32,
                             fontWeight: current ? 700 : 500,
-                            padding: "12px 16px",
+                            padding: "0 28px",
                         } }
                     >
                         { STEP_LABEL[step] }
@@ -521,9 +541,9 @@ function LiveOverlay({ activeIndex }: { activeIndex: number }) {
     const visible = started.slice(-5);
     const step = MAIN_PATH[activeIndex] ?? "invoice";
     return (
-        <div style={ { display: "flex", flexDirection: "column", gap: 18, minWidth: 0 } }>
-            <div style={ { overflow: "hidden", width: 980 } }>
-                <div style={ { transform: "scale(0.62)", transformOrigin: "top left", width: 1500 } }>
+        <div style={ { display: "flex", flex: 1, flexDirection: "column", gap: 18, minWidth: 0 } }>
+            <div style={ { overflow: "hidden", width: "100%" } }>
+                <div style={ { transform: "scale(0.76)", transformOrigin: "top left", width: 1400 } }>
                     <AgentChain
                         active={ step }
                         floor
@@ -535,25 +555,37 @@ function LiveOverlay({ activeIndex }: { activeIndex: number }) {
                 </div>
             </div>
             <div
-                style={ {
-                    background: theme.white,
-                    border: `1px solid ${theme.border}`,
-                    borderRadius: 16,
-                    padding: 16,
-                } }
+            style={ {
+                background: theme.white,
+                border: `1px solid ${theme.border}`,
+                borderRadius: 16,
+                display: "flex",
+                flex: 1,
+                flexDirection: "column",
+                padding: 16,
+            } }
             >
                 <div
                     style={ {
                         color: theme.inkSoft,
                         fontFamily: fontSans,
-                        fontSize: 16,
+                        fontSize: 22,
                         fontWeight: 700,
                         letterSpacing: 1.1,
                     } }
                 >
                     OPEN BALANCE · $2,400
                 </div>
-                <div style={ { display: "flex", flexDirection: "column", gap: 8, marginTop: 12 } }>
+                <div
+                    style={ {
+                        display: "flex",
+                        flex: 1,
+                        flexDirection: "column",
+                        gap: 14,
+                        justifyContent: "space-evenly",
+                        marginTop: 12,
+                    } }
+                >
                     { visible.map((line) => {
                         const tenant = line.speaker === "John";
                         return (
@@ -565,8 +597,8 @@ function LiveOverlay({ activeIndex }: { activeIndex: number }) {
                                     borderRadius: 14,
                                     color: tenant ? theme.mint : theme.ink,
                                     fontFamily: fontSans,
-                                    fontSize: 18,
-                                    maxWidth: 520,
+                                    fontSize: 26,
+                                    maxWidth: 720,
                                     padding: "10px 14px",
                                 } }
                             >
@@ -609,7 +641,7 @@ function LiveCallScene({ overlay }: { overlay: boolean }) {
                     width: "42%",
                 } }
             >
-                <Phone width={ 400 }>
+                <Phone width={ 470 }>
                     { ASSET_FLAGS.hasCall ? (
                         <div style={ { height: "100%", overflow: "hidden" } }>
                             <OffthreadVideo
@@ -628,14 +660,15 @@ function LiveCallScene({ overlay }: { overlay: boolean }) {
                     display: "flex",
                     flexDirection: "column",
                     gap: 16,
-                    padding: `48px 40px ${BOTTOM_SAFE}px 8px`,
+                    height: "100%",
+                    padding: `36px 36px ${BOTTOM_SAFE}px 8px`,
                     width: "58%",
                 } }
             >
                 <div
                     style={ {
                         color: theme.ink,
-                        fontSize: 28,
+                        fontSize: 40,
                         fontWeight: 700,
                     } }
                 >
@@ -720,7 +753,7 @@ function Sidebar() {
     );
 }
 
-function Tile({ active, tile }: { active: boolean; tile: IHomeTile }) {
+function Tile({ active, large = false, tile }: { active: boolean; large?: boolean; tile: IHomeTile }) {
     return (
         <div
             style={ {
@@ -728,14 +761,18 @@ function Tile({ active, tile }: { active: boolean; tile: IHomeTile }) {
                 border: active ? `2px solid ${theme.violet}` : `1px solid ${theme.border}`,
                 borderRadius: 20,
                 boxShadow: active ? `0 0 0 4px ${theme.activeBg}` : undefined,
-                padding: "18px 20px",
+                display: large ? "flex" : undefined,
+                flexDirection: large ? "column" : undefined,
+                height: large ? "100%" : undefined,
+                justifyContent: large ? "center" : undefined,
+                padding: large ? "48px 56px" : "18px 20px",
             } }
         >
             <div
                 style={ {
                     color: theme.mutedInk,
                     fontFamily: fontSans,
-                    fontSize: 16,
+                    fontSize: large ? 28 : 16,
                     fontWeight: 700,
                     letterSpacing: 1.5,
                     textTransform: "uppercase",
@@ -747,7 +784,7 @@ function Tile({ active, tile }: { active: boolean; tile: IHomeTile }) {
                 style={ {
                     color: theme.ink,
                     fontFamily: fontSans,
-                    fontSize: 40,
+                    fontSize: large ? 96 : 40,
                     fontVariantNumeric: "tabular-nums",
                     fontWeight: 650,
                     marginTop: 8,
@@ -792,11 +829,11 @@ function HomeScene() {
                     display: "flex",
                     flex: 1,
                     flexDirection: "column",
-                    gap: 18,
-                    padding: `28px 36px ${BOTTOM_SAFE}px`,
+                    gap: 12,
+                    padding: `20px 28px ${BOTTOM_SAFE}px`,
                 } }
             >
-                <div style={ { display: "flex", gap: 22 } }>
+                <div style={ { alignItems: "center", display: "flex", gap: 22 } }>
                     <div
                         style={ {
                             borderBottom: `3px solid ${theme.violet}`,
@@ -820,6 +857,22 @@ function HomeScene() {
                     >
                         Live calls
                     </div>
+                    <div style={ { flex: 1 } } />
+                    <span
+                        style={ {
+                            border: `1px solid ${theme.ink}`,
+                            borderRadius: theme.radiusPill,
+                            color: theme.ink,
+                            fontFamily: fontSans,
+                            fontSize: 13,
+                            fontWeight: 800,
+                            letterSpacing: 1.2,
+                            padding: "4px 10px",
+                            textTransform: "uppercase",
+                        } }
+                    >
+                        { DEMO_DATA_TAG }
+                    </span>
                 </div>
                 <div
                     style={ {
@@ -842,13 +895,13 @@ function HomeScene() {
                         border: focus === "needs" ? `2px solid ${theme.violet}` : `1px solid ${theme.border}`,
                         borderRadius: 20,
                         opacity: needsOn ? 1 : 0.4,
-                        padding: "16px 18px",
+                        padding: "12px 16px",
                     } }
                 >
                     <div
                         style={ {
                             fontFamily: fontSans,
-                            fontSize: 22,
+                            fontSize: 20,
                             fontWeight: 700,
                         } }
                     >
@@ -861,16 +914,16 @@ function HomeScene() {
                                 alignItems: "center",
                                 borderTop: `1px solid ${theme.border}`,
                                 display: "flex",
-                                gap: 16,
-                                marginTop: 10,
-                                paddingTop: 10,
+                                gap: 12,
+                                marginTop: 6,
+                                paddingTop: 6,
                             } }
                         >
                             <div style={ { flex: 1 } }>
-                                <div style={ { fontFamily: fontSans, fontSize: 20, fontWeight: 700 } }>
+                                <div style={ { fontFamily: fontSans, fontSize: 18, fontWeight: 700 } }>
                                     { row.tenant }
                                 </div>
-                                <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 16 } }>
+                                <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 15 } }>
                                     { row.property }
                                     { " · " }
                                     { row.reason }
@@ -901,35 +954,38 @@ function HomeScene() {
                             padding: "16px 18px",
                         } }
                     >
-                        <div style={ { alignItems: "center", display: "flex", gap: 12 } }>
-                            <div style={ { flex: 1 } }>
-                                <div style={ { fontFamily: fontSans, fontSize: 22, fontWeight: 700 } }>
-                                    { OPEN_CALL.tenant }
+                        <div style={ { fontFamily: fontSans, fontSize: 22, fontWeight: 700 } }>
+                            { OPEN_CALL.tenant }
+                        </div>
+                        <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 16 } }>
+                            { OPEN_CALL.property }
+                        </div>
+                        { OPEN_CALL.lines.map((line) => (
+                            <div
+                                key={ line.text }
+                                style={ {
+                                    alignItems: "center",
+                                    display: "flex",
+                                    gap: 16,
+                                    marginTop: 8,
+                                } }
+                            >
+                                <div
+                                    style={ {
+                                        background: theme.ink,
+                                        borderRadius: 14,
+                                        color: theme.mint,
+                                        flex: 1,
+                                        fontFamily: fontSans,
+                                        fontSize: 20,
+                                        padding: "10px 14px",
+                                    } }
+                                >
+                                    { line.text }
                                 </div>
-                                <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 16 } }>
-                                    { OPEN_CALL.property }
-                                    { " · " }
-                                    { OPEN_CALL.amount }
-                                    { " · " }
-                                    { OPEN_CALL.step }
-                                </div>
+                                <StatusBadge status={ line.chip } />
                             </div>
-                            <StatusBadge status={ OPEN_CALL.status } />
-                        </div>
-                        <div
-                            style={ {
-                                background: theme.ink,
-                                borderRadius: 16,
-                                color: theme.mint,
-                                fontFamily: fontSans,
-                                fontSize: 22,
-                                marginTop: 14,
-                                maxWidth: 760,
-                                padding: "14px 16px",
-                            } }
-                        >
-                            { OPEN_CALL.line }
-                        </div>
+                        )) }
                     </div>
                 ) : null }
             </div>
@@ -958,18 +1014,18 @@ function CloseScene() {
                 } }
             >
                 <Logo
-                    markHeight={ 120 }
+                    markHeight={ 160 }
                     tone="mint"
-                    wordmarkSize={ 92 }
+                    wordmarkSize={ 120 }
                 />
                 <div
                     style={ {
                         color: theme.ink,
                         fontFamily: fontSans,
-                        fontSize: 36,
+                        fontSize: 52,
                         fontWeight: 650,
-                        marginTop: 36,
-                        maxWidth: 1100,
+                        marginTop: 48,
+                        maxWidth: 1400,
                         textAlign: "center",
                     } }
                 >
@@ -987,15 +1043,15 @@ function CloseScene() {
         return (
             <AbsoluteFill
                 style={ {
-                    alignItems: "center",
                     background: theme.bg,
-                    justifyContent: "center",
+                    padding: "72px 96px 180px",
                 } }
             >
-                <div style={ { transform: `scale(${scale})`, width: 760 } }>
+                <div style={ { height: "100%", transform: `scale(${scale})`, width: "100%" } }>
                     { recovered ? (
                         <Tile
                             active
+                            large
                             tile={ recovered }
                         />
                     ) : null }
@@ -1008,22 +1064,32 @@ function CloseScene() {
             style={ {
                 alignItems: "center",
                 background: theme.mintWash,
+                display: "flex",
+                flexDirection: "column",
                 fontFamily: fontDisplay,
-                justifyContent: "center",
-                padding: 120,
+                padding: "56px 88px 140px",
             } }
         >
-            <div style={ { display: "flex", flexDirection: "column", gap: 28, maxWidth: 1400 } }>
-                <div style={ { fontSize: 64, lineHeight: 1.05 } }>
+            <div
+                style={ {
+                    display: "flex",
+                    flex: 1,
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    maxWidth: 1700,
+                    width: "100%",
+                } }
+            >
+                <div style={ { fontSize: 92, lineHeight: 0.98 } }>
                     A plan that fits his payday
                 </div>
-                <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 36, fontWeight: 600 } }>
+                <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 48, fontWeight: 650 } }>
                     instead of a late-fee letter
                 </div>
-                <div style={ { fontSize: 64, lineHeight: 1.05, marginTop: 12 } }>
+                <div style={ { fontSize: 92, lineHeight: 0.98 } }>
                     The manager gets paid today
                 </div>
-                <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 36, fontWeight: 600 } }>
+                <div style={ { color: theme.inkSoft, fontFamily: fontSans, fontSize: 48, fontWeight: 650 } }>
                     with no notice and no filing
                 </div>
             </div>

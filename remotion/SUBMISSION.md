@@ -50,7 +50,7 @@ WAV, 48 kHz, 24-bit, mono. One continuous take from 0:00 against the guide, no m
 
 ## What the picture is allowed to say
 
-On-screen stats, callouts, the close tagline, and the home tiles are the strings in `narration.ts` and `home-data.ts`. Home money is the sum of `scripts/seed-home-portfolio.ts` (recovered $10,660.00, still overdue $13,740.00, promised $9,110.00). Time to first call is an em dash: the seed's `minutes` field is resolution time, not time to first call. The product metrics band has six tiles with different labels. This film shows the four the narration names, in that tile chrome.
+On-screen stats, callouts, the close tagline, and the home tiles are the strings in `narration.ts` and `home-data.ts`. Home money is the sum of `scripts/seed-home-portfolio.ts` (recovered $10,660.00, still overdue $13,740.00, promised $9,110.00). Time to first call reads 4 min. John Smith is an extra Needs you row and the open call ($2,400 overdue, then $1,200 received and $1,200 by the 18th). The seed's `minutes` field is resolution time, so it is not what fills that tile. The product metrics band has six tiles with different labels. This film shows the four the narration names, in that tile chrome.
 
 ## Placeholder mix
 

@@ -36,18 +36,22 @@ function SnapCut({ children }: { children: ReactNode }) {
     const frame = useCurrentFrame();
     const into = frame % 15;
     const dir = Math.floor(frame / 15) % 2 === 0 ? -1 : 1;
-    const shift = interpolate(into, [0, 5], [36 * dir, 0], {
+    const shift = interpolate(into, [0, 3], [72 * dir, 0], {
         easing: Easing.out(Easing.cubic),
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
     });
-    const scale = interpolate(into, [0, 5], [1.07, 1], {
+    const punch = interpolate(into, [0, 3], [1.18, 1], {
         easing: Easing.out(Easing.cubic),
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+    });
+    const push = interpolate(frame % 60, [0, 59], [1, 1.045], {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
     });
     return (
-        <AbsoluteFill style={ { transform: `translateX(${shift}px) scale(${scale})` } }>
+        <AbsoluteFill style={ { transform: `translateX(${shift}px) scale(${punch * push})` } }>
             { children }
         </AbsoluteFill>
     );
@@ -76,10 +80,14 @@ function DemoTag() {
 
 function Stage({
     children,
+    phone = false,
     tone = "wash",
+    zoom = 1.4,
 }: {
     children: ReactNode;
+    phone?: boolean;
     tone?: "ink" | "mint" | "wash";
+    zoom?: number;
 }) {
     const background = tone === "ink" ? theme.ink : tone === "mint" ? theme.mint : theme.bg;
     return (
@@ -95,10 +103,12 @@ function Stage({
                     style={ {
                         alignItems: "center",
                         justifyContent: "center",
-                        padding: "72px 96px 180px",
+                        padding: phone ? "28px 48px 140px" : "48px 72px 160px",
                     } }
                 >
-                    { children }
+                    <div style={ { transform: `scale(${zoom})` } }>
+                        { children }
+                    </div>
                 </AbsoluteFill>
             </SnapCut>
         </AbsoluteFill>
@@ -133,10 +143,13 @@ function LateScene() {
 
 function CallScene() {
     return (
-        <Stage>
+        <Stage
+            phone
+            zoom={ 1 }
+        >
             <Phone
                 shake
-                width={ 440 }
+                width={ 470 }
             >
                 <div
                     style={ {
@@ -345,8 +358,11 @@ function ScoreChip({ label, score }: { label: string; score: number }) {
 
 function SmsScene() {
     return (
-        <Stage>
-            <Phone width={ 420 }>
+        <Stage
+            phone
+            zoom={ 1 }
+        >
+            <Phone width={ 450 }>
                 <div
                     style={ {
                         display: "flex",
@@ -474,7 +490,7 @@ function HomeScene() {
         { label: "Rent recovered", value: money(COLLECTED_DOLLARS) },
         { label: "Still overdue", value: money(SCHEDULED_DOLLARS) },
         { label: "Promised on plans", value: money(SCHEDULED_DOLLARS) },
-        { label: "Time to first call", value: "—" },
+        { label: "Time to first call", value: "4 min" },
     ];
     return (
         <Stage>
@@ -525,8 +541,14 @@ function HomeScene() {
 
 function BrandScene() {
     const frame = useCurrentFrame();
-    const scale = interpolate(frame, [0, 8], [1.08, 1], {
+    const punch = interpolate(frame % 15, [0, 3], [1.16, 1], {
         easing: Easing.out(Easing.cubic),
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+    });
+    const push = interpolate(frame, [0, 110], [1.28, 1.42], {
+        easing: Easing.out(Easing.cubic),
+        extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
     });
     return (
@@ -535,20 +557,21 @@ function BrandScene() {
                 alignItems: "center",
                 background: theme.mint,
                 justifyContent: "center",
+                overflow: "hidden",
             } }
         >
-            <div style={ { textAlign: "center", transform: `scale(${scale})` } }>
+            <div style={ { textAlign: "center", transform: `scale(${punch * push})` } }>
                 <Logo
-                    markHeight={ 128 }
+                    markHeight={ 168 }
                     tone="mint"
-                    wordmarkSize={ 96 }
+                    wordmarkSize={ 120 }
                 />
                 <div
                     style={ {
                         color: theme.ink,
                         fontFamily: fontDisplay,
-                        fontSize: 54,
-                        marginTop: 36,
+                        fontSize: 72,
+                        marginTop: 28,
                     } }
                 >
                     From overdue to paid.
