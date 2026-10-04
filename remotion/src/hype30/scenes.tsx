@@ -32,16 +32,18 @@ function money(amount: number): string {
     return `$${body}.00`;
 }
 
-function SnapCut({ children }: { children: ReactNode }) {
+function SnapCut({ children, drift = true }: { children: ReactNode; drift?: boolean }) {
     const frame = useCurrentFrame();
     const into = frame % 15;
     const dir = Math.floor(frame / 15) % 2 === 0 ? -1 : 1;
-    const shift = interpolate(into, [0, 3], [72 * dir, 0], {
-        easing: Easing.out(Easing.cubic),
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-    });
-    const punch = interpolate(into, [0, 3], [1.18, 1], {
+    const shift = drift
+        ? interpolate(into, [0, 3], [72 * dir, 0], {
+            easing: Easing.out(Easing.cubic),
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+        })
+        : 0;
+    const punch = interpolate(into, [0, 3], [drift ? 1.18 : 1.04, 1], {
         easing: Easing.out(Easing.cubic),
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
@@ -80,11 +82,13 @@ function DemoTag() {
 
 function Stage({
     children,
+    drift = true,
     phone = false,
     tone = "wash",
     zoom = 1.4,
 }: {
     children: ReactNode;
+    drift?: boolean;
     phone?: boolean;
     tone?: "ink" | "mint" | "wash";
     zoom?: number;
@@ -98,7 +102,7 @@ function Stage({
                 overflow: "hidden",
             } }
         >
-            <SnapCut>
+            <SnapCut drift={ drift }>
                 <AbsoluteFill
                     style={ {
                         alignItems: "center",
@@ -295,7 +299,7 @@ function HardshipScene() {
                 } }
             >
                 <div style={ { alignItems: "center", display: "flex", justifyContent: "space-between" } }>
-                    <div style={ { fontFamily: fontDisplay, fontSize: 42 } }>Jev</div>
+                    <div style={ { fontFamily: fontDisplay, fontSize: 42 } }>Hardship check</div>
                     <div style={ { display: "flex", gap: 12 } }>
                         <DemoTag />
                         <span
@@ -357,35 +361,66 @@ function ScoreChip({ label, score }: { label: string; score: number }) {
 }
 
 function SmsScene() {
+    const frame = useCurrentFrame();
+    const punch = interpolate(frame, [18, 32], [1, 1.06], {
+        easing: Easing.out(Easing.cubic),
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+    });
+    const bubbles = [
+        "Your tap repair is booked for Thursday.",
+        "October's $2,400 is unpaid.",
+    ];
     return (
         <Stage
             phone
             zoom={ 1 }
         >
-            <Phone width={ 450 }>
+            <Phone width={ 470 }>
                 <div
                     style={ {
                         display: "flex",
                         flexDirection: "column",
-                        gap: 16,
+                        gap: 18,
                         height: "100%",
-                        justifyContent: "flex-end",
-                        paddingBottom: 12,
+                        justifyContent: "space-between",
+                        paddingBottom: 8,
                     } }
                 >
-                    <div
-                        style={ {
-                            background: theme.mint,
-                            borderRadius: 18,
-                            color: theme.ink,
-                            fontFamily: fontDisplay,
-                            fontSize: 32,
-                            padding: "18px 16px",
-                        } }
-                    >
-                        { ASSISTANCE_URL }
+                    <div style={ { fontSize: 20, fontWeight: 800 } }>Mia · Sunset Properties</div>
+                    { bubbles.map((text) => (
+                        <div
+                            key={ text }
+                            style={ {
+                                background: theme.mintSoft,
+                                borderRadius: 18,
+                                fontSize: 26,
+                                fontWeight: 650,
+                                lineHeight: 1.25,
+                                padding: "16px 16px",
+                            } }
+                        >
+                            { text }
+                        </div>
+                    )) }
+                    <div style={ { transform: `scale(${punch})`, transformOrigin: "center center" } }>
+                        <div
+                            style={ {
+                                background: theme.mint,
+                                borderRadius: 18,
+                                color: theme.ink,
+                                fontFamily: fontDisplay,
+                                fontSize: 36,
+                                lineHeight: 1.15,
+                                padding: "22px 16px",
+                            } }
+                        >
+                            { ASSISTANCE_URL }
+                        </div>
                     </div>
-                    <div style={ { color: theme.inkSoft, fontSize: 16, fontWeight: 700 } }>Text message</div>
+                    <div style={ { color: theme.inkSoft, fontSize: 18, fontWeight: 700 } }>
+                        City rental assistance
+                    </div>
                 </div>
             </Phone>
         </Stage>
@@ -476,16 +511,6 @@ function ReceivedScene() {
 }
 
 function HomeScene() {
-    const frame = useCurrentFrame();
-    const zoom = interpolate(frame, [60, 90], [1, 1.55], {
-        easing: Easing.out(Easing.cubic),
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-    });
-    const lift = interpolate(frame, [60, 90], [0, -40], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-    });
     const tiles = [
         { label: "Rent recovered", value: money(COLLECTED_DOLLARS) },
         { label: "Still overdue", value: money(SCHEDULED_DOLLARS) },
@@ -493,12 +518,15 @@ function HomeScene() {
         { label: "Time to first call", value: "4 min" },
     ];
     return (
-        <Stage>
-            <div style={ { transform: `translateY(${lift}px) scale(${zoom})`, width: 1100 } }>
-                <div style={ { marginBottom: 16 } }>
+        <Stage
+            drift={ false }
+            zoom={ 1.12 }
+        >
+            <div style={ { width: 1280 } }>
+                <div style={ { marginBottom: 18 } }>
                     <DemoTag />
                 </div>
-                <div style={ { display: "grid", gap: 16, gridTemplateColumns: "1fr 1fr" } }>
+                <div style={ { display: "grid", gap: 18, gridTemplateColumns: "1fr 1fr" } }>
                     { tiles.map((tile, index) => (
                         <div
                             key={ tile.label }
@@ -507,13 +535,13 @@ function HomeScene() {
                                 border: index === 0 ? `3px solid ${theme.violet}` : `1px solid ${theme.border}`,
                                 borderRadius: 20,
                                 boxShadow: index === 0 ? `0 0 0 6px ${theme.activeBg}` : undefined,
-                                padding: "20px 22px",
+                                padding: "28px 26px",
                             } }
                         >
                             <div
                                 style={ {
                                     color: theme.mutedInk,
-                                    fontSize: 16,
+                                    fontSize: 20,
                                     fontWeight: 800,
                                     letterSpacing: 1.5,
                                     textTransform: "uppercase",
@@ -523,10 +551,10 @@ function HomeScene() {
                             </div>
                             <div
                                 style={ {
-                                    fontSize: 42,
+                                    fontSize: 52,
                                     fontVariantNumeric: "tabular-nums",
                                     fontWeight: 700,
-                                    marginTop: 8,
+                                    marginTop: 10,
                                 } }
                             >
                                 { tile.value }

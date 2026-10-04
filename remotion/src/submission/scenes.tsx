@@ -17,10 +17,12 @@ import { ASSET_FLAGS } from "./asset-flags";
 import { localFrameAtPhrase } from "./captions";
 import {
     DEMO_DATA_TAG,
+    formatDollars,
     HOME_TILES,
     NEEDS_YOU,
     NEEDS_YOU_HEADING,
     OPEN_CALL,
+    RECOVERED_DOLLARS,
     type IHomeTile,
 } from "./home-data";
 import {
@@ -36,6 +38,9 @@ import {
 import { LIVE_CALL_WINDOW, sectionById, sectionFrames } from "./timing";
 
 const BOTTOM_SAFE = 170;
+
+/** On-screen chain name in this film. The shared floor label stays "Jev check". */
+const CHAIN_LABEL = { ...STEP_LABEL, jev: "Hardship check" };
 
 function fadeIn(local: number): number {
     return interpolate(local, [0, 10], [0, 1], {
@@ -523,7 +528,7 @@ function StepRail({ activeIndex }: { activeIndex: number }) {
                             padding: "0 28px",
                         } }
                     >
-                        { STEP_LABEL[step] }
+                        { CHAIN_LABEL[step] }
                     </div>
                 );
             }) }
@@ -547,6 +552,7 @@ function LiveOverlay({ activeIndex }: { activeIndex: number }) {
                     <AgentChain
                         active={ step }
                         floor
+                        labels={ CHAIN_LABEL }
                         litThrough={ activeIndex }
                         nodeWidth={ 150 }
                         showHandoff={ false }
@@ -772,7 +778,7 @@ function Tile({ active, large = false, tile }: { active: boolean; large?: boolea
                 style={ {
                     color: theme.mutedInk,
                     fontFamily: fontSans,
-                    fontSize: large ? 28 : 16,
+                    fontSize: large ? 36 : 16,
                     fontWeight: 700,
                     letterSpacing: 1.5,
                     textTransform: "uppercase",
@@ -784,7 +790,7 @@ function Tile({ active, large = false, tile }: { active: boolean; large?: boolea
                 style={ {
                     color: theme.ink,
                     fontFamily: fontSans,
-                    fontSize: large ? 96 : 40,
+                    fontSize: large ? 140 : 40,
                     fontVariantNumeric: "tabular-nums",
                     fontWeight: 650,
                     marginTop: 8,
@@ -829,7 +835,9 @@ function HomeScene() {
                     display: "flex",
                     flex: 1,
                     flexDirection: "column",
-                    gap: 12,
+                    gap: 14,
+                    height: "100%",
+                    minHeight: 0,
                     padding: `20px 28px ${BOTTOM_SAFE}px`,
                 } }
             >
@@ -891,11 +899,16 @@ function HomeScene() {
                 </div>
                 <div
                     style={ {
+                        display: "flex",
+                        flex: transcriptOn ? undefined : 1,
+                        flexDirection: "column",
                         background: theme.white,
                         border: focus === "needs" ? `2px solid ${theme.violet}` : `1px solid ${theme.border}`,
                         borderRadius: 20,
+                        justifyContent: "space-between",
+                        minHeight: 0,
                         opacity: needsOn ? 1 : 0.4,
-                        padding: "12px 16px",
+                        padding: "16px 18px",
                     } }
                 >
                     <div
@@ -945,12 +958,17 @@ function HomeScene() {
                         </div>
                     )) }
                 </div>
-                { transcriptOn ? (
+                    { transcriptOn ? (
                     <div
                         style={ {
                             background: theme.white,
                             border: `2px solid ${theme.violet}`,
                             borderRadius: 20,
+                            display: "flex",
+                            flex: 1,
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            minHeight: 0,
                             padding: "16px 18px",
                         } }
                     >
@@ -995,11 +1013,10 @@ function HomeScene() {
 
 function CloseScene() {
     const frame = useCurrentFrame();
-    const zoomAt = localFrameAtPhrase("close", "64 billion");
-    const logoAt = localFrameAtPhrase("close", "RentRecovery");
-    const logoIn = logoAt - 12;
+    const tileAt = localFrameAtPhrase("close", "64 billion");
+    const logoIn = sectionFrames(sectionById("close")).duration - 90;
     if (frame >= logoIn) {
-        const opacity = interpolate(frame, [logoIn, logoAt], [0, 1], {
+        const opacity = interpolate(frame, [logoIn, logoIn + 12], [0, 1], {
             easing: Easing.out(Easing.cubic),
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
@@ -1010,49 +1027,54 @@ function CloseScene() {
                     alignItems: "center",
                     background: theme.mint,
                     justifyContent: "center",
-                    opacity,
+                    padding: "80px 100px",
                 } }
             >
-                <Logo
-                    markHeight={ 160 }
-                    tone="mint"
-                    wordmarkSize={ 120 }
-                />
-                <div
-                    style={ {
-                        color: theme.ink,
-                        fontFamily: fontSans,
-                        fontSize: 52,
-                        fontWeight: 650,
-                        marginTop: 48,
-                        maxWidth: 1400,
-                        textAlign: "center",
-                    } }
-                >
-                    { CLOSE_TAGLINE }
+                <div style={ { opacity, textAlign: "center" } }>
+                    <Logo
+                        markHeight={ 220 }
+                        tone="mint"
+                        wordmarkSize={ 132 }
+                    />
+                    <div
+                        style={ {
+                            color: theme.ink,
+                            fontFamily: fontSans,
+                            fontSize: 48,
+                            fontWeight: 650,
+                            marginTop: 48,
+                            maxWidth: 1500,
+                        } }
+                    >
+                        { CLOSE_TAGLINE }
+                    </div>
                 </div>
             </AbsoluteFill>
         );
     }
-    if (frame >= zoomAt) {
-        const scale = interpolate(frame, [zoomAt, zoomAt + 20], [0.92, 1], {
+    if (frame >= tileAt) {
+        const counted = Math.round(interpolate(frame, [tileAt, tileAt + 70], [0, RECOVERED_DOLLARS], {
+            easing: Easing.out(Easing.cubic),
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
-        });
+        }));
         const recovered = HOME_TILES[0];
+        const tile = recovered
+            ? { ...recovered, value: formatDollars(counted) }
+            : null;
         return (
             <AbsoluteFill
                 style={ {
                     background: theme.bg,
-                    padding: "72px 96px 180px",
+                    padding: "48px 64px 48px",
                 } }
             >
-                <div style={ { height: "100%", transform: `scale(${scale})`, width: "100%" } }>
-                    { recovered ? (
+                <div style={ { height: "100%", width: "100%" } }>
+                    { tile ? (
                         <Tile
                             active
                             large
-                            tile={ recovered }
+                            tile={ tile }
                         />
                     ) : null }
                 </div>

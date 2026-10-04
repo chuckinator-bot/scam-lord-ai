@@ -31,6 +31,7 @@ export function AgentChain({
     gap = 28,
     badge,
     floor = false,
+    labels,
 }: {
     tenant: string;
     litThrough: number;
@@ -41,6 +42,8 @@ export function AgentChain({
     badge?: TStatus;
     /** StepNode chrome: current step uses the ring, other steps stay on the card border. */
     floor?: boolean;
+    /** Optional on-screen names. Omitted steps keep STEP_LABEL. */
+    labels?: Partial<Record<TAgentStep, string>>;
 }) {
     const nodeHeight = Math.max(72, Math.round(nodeWidth * 0.46));
     const layout = layoutChain(nodeWidth, gap).filter((node) => showHandoff || node.step !== "handoff");
@@ -200,7 +203,7 @@ export function AgentChain({
                                 marginTop: 4,
                             } }
                         >
-                            { STEP_LABEL[node.step] }
+                            { labels?.[node.step] ?? STEP_LABEL[node.step] }
                         </div>
                         { current && badge ? (
                             <div style={ { marginTop: 8 } }>
